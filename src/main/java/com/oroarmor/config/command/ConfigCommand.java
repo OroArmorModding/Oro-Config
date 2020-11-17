@@ -26,10 +26,27 @@ import net.minecraft.text.MutableText;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
 
+/**
+ * Creates a command register callback that is based of of a config. <br>
+ * <br>
+ * Register with:
+ * <code>CommandRegistrationCallback.EVENT.register(new ConfigCommand(yourConfigInstance));</code>
+ * 
+ * @author Eli Orona
+ *
+ */
 public class ConfigCommand implements CommandRegistrationCallback {
 
+	/**
+	 * The config
+	 */
 	protected final Config config;
 
+	/**
+	 * Creates a new ConfigCommand with the config
+	 * 
+	 * @param config The config
+	 */
 	public ConfigCommand(Config config) {
 		this.config = config;
 	}

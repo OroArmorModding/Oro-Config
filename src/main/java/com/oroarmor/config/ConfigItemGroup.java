@@ -7,15 +7,34 @@ import java.util.stream.Collectors;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+/**
+ * Extending {@link ConfigItem}, {@link ConfigItemGroup} can store multiple
+ * {@link ConfigItem}s
+ * 
+ * @author Eli Orona
+ *
+ */
 public class ConfigItemGroup extends ConfigItem<ConfigItemGroup> {
 
+	/**
+	 * The list of {@link ConfigItem}
+	 */
 	private final List<ConfigItem<?>> configs;
 
+	/**
+	 * BAD CONSTRUCTOR ONLY FOR DEFAULT VALUE. DO NOT USE
+	 */
 	private ConfigItemGroup() {
 		super(null, null, null);
 		configs = null;
 	}
 
+	/**
+	 * Creates a new {@link ConfigItemGroup} with the list of configs and the name
+	 * 
+	 * @param configs The list of configs
+	 * @param name    The name of this group
+	 */
 	public ConfigItemGroup(List<ConfigItem<?>> configs, String name) {
 		super(name, new ConfigItemGroup(), "");
 		this.configs = configs;
@@ -29,10 +48,20 @@ public class ConfigItemGroup extends ConfigItem<ConfigItemGroup> {
 		}
 	}
 
+	/**
+	 * 
+	 * @return The configs for this group
+	 */
 	public List<ConfigItem<?>> getConfigs() {
 		return configs;
 	}
 
+	/**
+	 * Turns a config into a json property
+	 * 
+	 * @param c      The config item
+	 * @param object the json object
+	 */
 	private void parseConfig(ConfigItem<?> c, JsonObject object) {
 		switch (c.getType()) {
 		case BOOLEAN:
@@ -52,6 +81,11 @@ public class ConfigItemGroup extends ConfigItem<ConfigItemGroup> {
 		}
 	}
 
+	/**
+	 * Converts the config items into json
+	 * 
+	 * @return
+	 */
 	public JsonObject toJson() {
 		JsonObject object = new JsonObject();
 

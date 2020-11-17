@@ -6,10 +6,33 @@ import org.jetbrains.annotations.Nullable;
 
 import com.google.gson.JsonElement;
 
+/**
+ * {@link ConfigItem} often stores a name and a value for saving data into a
+ * config. <br>
+ * The current supported types are booleans, integers, doubles, strings, and
+ * {@link ConfigItemGroup}
+ * 
+ * @author Eli Orona
+ *
+ * @param <T>
+ */
 public class ConfigItem<T> {
+	/**
+	 * The current types for the config items
+	 * 
+	 * @author Eli Orona
+	 *
+	 */
 	public enum Type {
 		BOOLEAN, INTEGER, DOUBLE, STRING, GROUP;
 
+		/**
+		 * Gets the corresponding type for an object. If the object's type is not
+		 * supported, this returns null.
+		 * 
+		 * @param value The object to find the type for
+		 * @return The type for that object
+		 */
 		public static Type getTypeFrom(Object value) {
 			if (value instanceof Boolean) {
 				return BOOLEAN;
@@ -43,10 +66,29 @@ public class ConfigItem<T> {
 	@Nullable
 	protected final Consumer<ConfigItem<T>> onChange;
 
+	/**
+	 * Creates a new config with the name, defaultValue, and details
+	 * 
+	 * @param name         The name for the config item
+	 * @param defaultValue The default value in case of a corrupted/missing config
+	 * @param details      A translatable string for readability in multiple
+	 *                     languages
+	 */
 	public ConfigItem(String name, T defaultValue, String details) {
 		this(name, defaultValue, details, null);
 	}
 
+	/**
+	 * Creates a new config with the name, defaultValue, details, and an onChange
+	 * consumer
+	 * 
+	 * @param name         The name for the config item
+	 * @param defaultValue The default value in case of a corrupted/missing config
+	 * @param details      A translatable string for readability in multiple
+	 *                     languages
+	 * @param onChange     A {@link Consumer} that is run every time the config item
+	 *                     is modified
+	 */
 	public ConfigItem(String name, T defaultValue, String details, Consumer<ConfigItem<T>> onChange) {
 		this.name = name;
 		this.details = details;
@@ -56,6 +98,12 @@ public class ConfigItem<T> {
 		this.onChange = onChange;
 	}
 
+	/**
+	 * Reads and sets the {@link ConfigItem} from a JSON Element. Will throw an
+	 * error if the type does not match the type of the {@link ConfigItem}
+	 * 
+	 * @param element The JSON Element
+	 */
 	@SuppressWarnings("unchecked")
 	public void fromJson(JsonElement element) {
 		T newValue = null;
@@ -91,26 +139,51 @@ public class ConfigItem<T> {
 
 	}
 
+	/**
+	 * 
+	 * @return The default value of the {@link ConfigItem}
+	 */
 	public T getDefaultValue() {
 		return defaultValue;
 	}
 
+	/**
+	 * 
+	 * @return The detail string of the {@link ConfigItem}
+	 */
 	public String getDetails() {
 		return details;
 	}
 
+	/**
+	 * 
+	 * @return the name of the {@link ConfigItem}
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * 
+	 * @return The type of the {@link ConfigItem}
+	 */
 	public Type getType() {
 		return type;
 	}
 
+	/**
+	 * 
+	 * @return The current value of the {@link ConfigItem}
+	 */
 	public T getValue() {
 		return value;
 	}
 
+	/**
+	 * Sets the value of the {@link ConfigItem}
+	 * 
+	 * @param value The value to set
+	 */
 	public void setValue(T value) {
 		this.value = value;
 		if (this.onChange != null) {
