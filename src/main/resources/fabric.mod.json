@@ -12,9 +12,10 @@
   },
 
   "license": "CC0-1.0",
-  "icon": "assets/netherite_plus/icon.png",
+  "icon": "",
 
   "environment": "*",
+  
   "entrypoints": {
   },
   "mixins": [
@@ -22,7 +23,7 @@
 
   "depends": {
     "fabricloader": ">=0.7.4",
-    "fabric": "*",
+    "fabric": "*"
   },
   "suggests": {
     "flamingo": "*"
