@@ -84,10 +84,10 @@ public class Config {
 	public <T> T getValue(String path, Class<T> clazz) {
 		String[] splitPath = path.split("\\.");
 
-		ConfigItem<?> selectedItem = null;
-		int index = 0;
+		ConfigItem<?> selectedItem = getConfigs().stream().filter(cig -> cig.name.equals(splitPath[0])).findFirst().get();
+		int index = 1;
 		while (selectedItem instanceof ConfigItemGroup) {
-			selectedItem = ((index == 0) ? getConfigs() : ((ConfigItemGroup) selectedItem).getConfigs()).stream().filter(ci -> ci.name.equals(splitPath[index])).findFirst().get();
+			selectedItem = ((ConfigItemGroup) selectedItem).getConfigs().stream().filter(ci -> ci.name.equals(splitPath[index])).findFirst().get();
 		}
 
 		boolean validType = false;
