@@ -136,7 +136,6 @@ public class ConfigItem<T> {
 		if (newValue != null) {
 			setValue(newValue);
 		}
-
 	}
 
 	/**
@@ -195,5 +194,4 @@ public class ConfigItem<T> {
 	public String toString() {
 		return name + ":" + value;
 	}
-
 }

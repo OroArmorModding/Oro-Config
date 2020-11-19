@@ -1,5 +1,6 @@
 package com.oroarmor.config.modmenu;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 import com.oroarmor.config.Config;
@@ -102,7 +103,7 @@ public abstract class ModMenuConfigScreen implements ModMenuApi {
 		return entryBuilder.startStrField(new TranslatableText(ci.getDetails()), ci.getValue()).setSaveConsumer(ci::setValue).setDefaultValue(ci::getDefaultValue).build();
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void setupConfigItem(ConfigItem<?> ci, ConfigCategory category, ConfigEntryBuilder entryBuilder) {
 		switch (ci.getType()) {
 		case BOOLEAN:
@@ -112,7 +113,8 @@ public abstract class ModMenuConfigScreen implements ModMenuApi {
 			setupDoubleConfigItem((ConfigItem<Double>) ci, category, entryBuilder);
 			break;
 		case GROUP:
-			SubCategoryBuilder groupCategory = entryBuilder.startSubCategory(new TranslatableText(category.getCategoryKey().getString() + "." + ci.getName()), ((ConfigItemGroup) ci).getConfigs().stream().map(configItem -> createConfigItem(ci, entryBuilder)).collect(Collectors.toList()));
+			List<AbstractConfigListEntry> entryList = ((ConfigItemGroup) ci).getConfigs().stream().map(configItem -> createConfigItem(configItem, entryBuilder, category.getCategoryKey().getString() + "." + ci.getName())).collect(Collectors.toList());
+			SubCategoryBuilder groupCategory = entryBuilder.startSubCategory(new TranslatableText(category.getCategoryKey().getString() + "." + ci.getName()), entryList);
 			category.addEntry(groupCategory.build());
 			break;
 		case INTEGER:
@@ -126,8 +128,8 @@ public abstract class ModMenuConfigScreen implements ModMenuApi {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private AbstractConfigListEntry<?> createConfigItem(ConfigItem<?> ci, ConfigEntryBuilder entryBuilder) {
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private AbstractConfigListEntry<?> createConfigItem(ConfigItem<?> ci, ConfigEntryBuilder entryBuilder, String superGroupName) {
 		switch (ci.getType()) {
 		case BOOLEAN:
 			return createBooleanConfigItem((ConfigItem<Boolean>) ci, entryBuilder);
@@ -137,6 +139,10 @@ public abstract class ModMenuConfigScreen implements ModMenuApi {
 			return createIntegerConfigItem((ConfigItem<Integer>) ci, entryBuilder);
 		case STRING:
 			return createStringConfigItem((ConfigItem<String>) ci, entryBuilder);
+		case GROUP:
+			List<AbstractConfigListEntry> subItems = ((ConfigItemGroup) ci).getConfigs().stream().map(configItem -> createConfigItem(configItem, entryBuilder, superGroupName + "." + ci.getName())).collect(Collectors.toList());
+			SubCategoryBuilder groupCategory = entryBuilder.startSubCategory(new TranslatableText(superGroupName + "." + ci.getName()), subItems);
+			return groupCategory.build();
 		default:
 			return null;
 		}

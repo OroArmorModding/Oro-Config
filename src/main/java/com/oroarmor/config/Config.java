@@ -80,6 +80,45 @@ public class Config {
 
 	}
 
+	@SuppressWarnings("unchecked")
+	public <T> T getValue(String path, Class<T> clazz) {
+		String[] splitPath = path.split("\\.");
+
+		ConfigItem<?> selectedItem = null;
+		int index = 0;
+		while (selectedItem instanceof ConfigItemGroup) {
+			selectedItem = ((index == 0) ? getConfigs() : ((ConfigItemGroup) selectedItem).getConfigs()).stream().filter(ci -> ci.name.equals(splitPath[index])).findFirst().get();
+		}
+
+		boolean validType = false;
+
+		switch (selectedItem.getType()) {
+		case BOOLEAN:
+			validType = clazz == Boolean.class;
+			break;
+		case DOUBLE:
+			validType = clazz == Double.class;
+			break;
+		case GROUP:
+			validType = clazz == ConfigItemGroup.class;
+			break;
+		case INTEGER:
+			validType = clazz == Integer.class;
+			break;
+		case STRING:
+			validType = clazz == String.class;
+			break;
+		default:
+			break;
+		}
+
+		if (!validType) {
+			throw new IllegalArgumentException("Incorrect type " + clazz.getName() + " for " + path + ". Correct type is " + selectedItem.getType());
+		}
+
+		return ((ConfigItem<T>) selectedItem).getValue();
+	}
+
 	/**
 	 * Saves the current config to the file.
 	 */

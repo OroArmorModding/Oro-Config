@@ -14,6 +14,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.oroarmor.config.Config;
 import com.oroarmor.config.ConfigItem;
 import com.oroarmor.config.ConfigItemGroup;
+import com.oroarmor.config.ConfigItem.Type;
 
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.client.resource.language.I18n;
@@ -56,7 +57,7 @@ public class ConfigCommand implements CommandRegistrationCallback {
 		boolean atDefault = item.getDefaultValue().equals(item.getValue());
 		configListText.append(new LiteralText("[" + I18n.translate(item.getDetails()) + "]"));
 		configListText.append(" : ");
-		configListText.append(new LiteralText("[" + item.getValue() + "]").formatted(atDefault ? Formatting.GREEN : Formatting.DARK_GREEN).styled(s -> s.withHoverEvent(new HoverEvent(Action.SHOW_TEXT, new LiteralText((atDefault ? "At Default " : "") + "Value: " + (atDefault ? item.getDefaultValue() + ". Click to change value." : item.getValue() + ". Click to reset value.")))).withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/netherite_plus " + group.getName() + " " + item.getName() + " " + (atDefault ? "value" : item.getDefaultValue())))));
+		configListText.append(new LiteralText("[" + item.getValue() + "]").formatted(atDefault ? Formatting.GREEN : Formatting.DARK_GREEN).styled(s -> s.withHoverEvent(new HoverEvent(Action.SHOW_TEXT, new LiteralText((atDefault ? "At Default " : "") + "Value: " + (atDefault ? item.getDefaultValue() + ". Click to change value." : item.getValue() + ". Click to reset value.")))).withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + config.getID() + group.getName() + " " + item.getName() + " " + (atDefault ? "value" : item.getDefaultValue())))));
 		return configListText;
 	}
 
@@ -64,11 +65,10 @@ public class ConfigCommand implements CommandRegistrationCallback {
 		MutableText configList = new LiteralText("");
 
 		configList.append(new LiteralText(group.getName() + "\n").formatted(Formatting.BOLD));
-		for (ConfigItem<?> item : group.getConfigs()) {
-			configList.append("  |--> ");
-			configList.append(createItemText(item, group));
-			configList.append("\n");
-		}
+		for (ConfigItem<?> item : group.getConfigs())
+			parseConfigItemText(configList, group, item, "  ");
+
+		configList.append("/");
 
 		try {
 			c.getSource().getPlayer().sendSystemMessage(configList, Util.NIL_UUID);
@@ -86,8 +86,9 @@ public class ConfigCommand implements CommandRegistrationCallback {
 		for (ConfigItemGroup group : config.getConfigs()) {
 			configList.append(new LiteralText(group.getName() + "\n").formatted(Formatting.BOLD));
 			for (ConfigItem<?> item : group.getConfigs()) {
-				parseConfigItemText(configList, group, item, 1);
+				parseConfigItemText(configList, group, item, "  ");
 			}
+			configList.append("/");
 		}
 
 		try {
@@ -99,21 +100,20 @@ public class ConfigCommand implements CommandRegistrationCallback {
 		return 1;
 	}
 
-	protected void parseConfigItemText(MutableText configList, ConfigItemGroup group, ConfigItem<?> item, int i) {
-		for (int j = 0; j < i; j++) {
-			configList.append("  ");
-		}
-
+	protected void parseConfigItemText(MutableText configList, ConfigItemGroup group, ConfigItem<?> item, String padding) {
+		configList.append(padding);
 		configList.append("|--> ");
 		switch (item.getType()) {
 		case GROUP:
 			configList.append(new LiteralText(item.getName() + "\n").formatted(Formatting.BOLD));
 			for (ConfigItem<?> item2 : ((ConfigItemGroup) item).getConfigs()) {
-				parseConfigItemText(configList, (ConfigItemGroup) item, item2, i + 1);
+				parseConfigItemText(configList, (ConfigItemGroup) item, item2, padding + "| ");
 			}
+			configList.append(padding + "/\n");
 			break;
 		default:
 			configList.append(createItemText(item, group));
+			configList.append("\n");
 		}
 	}
 
@@ -142,26 +142,29 @@ public class ConfigCommand implements CommandRegistrationCallback {
 	protected void parseConfigItemGroupCommand(LiteralArgumentBuilder<ServerCommandSource> literalArgumentBuilder, ConfigItemGroup group) {
 		LiteralArgumentBuilder<ServerCommandSource> configGroupCommand = literal(group.getName()).executes((c) -> listConfigGroup(c, group));
 		for (ConfigItem<?> item : group.getConfigs()) {
-			LiteralArgumentBuilder<ServerCommandSource> configItemCommand = literal(item.getName()).executes((c) -> listItem(c, item, group));
+			if (item.getType() == Type.GROUP) {
+				parseConfigItemGroupCommand(configGroupCommand, (ConfigItemGroup) item);
+			} else {
+				LiteralArgumentBuilder<ServerCommandSource> configItemCommand = literal(item.getName()).executes((c) -> listItem(c, item, group));
 
-			switch (item.getType()) {
-			case BOOLEAN:
-				configItemCommand.then(argument("boolean", BoolArgumentType.bool()).executes(c -> setItemBoolean(c, (ConfigItem<Boolean>) item, group)));
-				break;
-			case DOUBLE:
-				configItemCommand.then(argument("double", DoubleArgumentType.doubleArg()).executes(c -> setItemDouble(c, (ConfigItem<Double>) item, group)));
-				break;
-			case GROUP:
-				parseConfigItemGroupCommand(literalArgumentBuilder, (ConfigItemGroup) item);
-				break;
-			case INTEGER:
-				configItemCommand.then(argument("int", IntegerArgumentType.integer()).executes(c -> setItemInteger(c, (ConfigItem<Integer>) item, group)));
-				break;
-			case STRING:
-				configItemCommand.then(argument("string", StringArgumentType.string()).executes(c -> setItemString(c, (ConfigItem<String>) item, group)));
-				break;
+				switch (item.getType()) {
+				case BOOLEAN:
+					configItemCommand.then(argument("boolean", BoolArgumentType.bool()).executes(c -> setItemBoolean(c, (ConfigItem<Boolean>) item, group)));
+					break;
+				case DOUBLE:
+					configItemCommand.then(argument("double", DoubleArgumentType.doubleArg()).executes(c -> setItemDouble(c, (ConfigItem<Double>) item, group)));
+					break;
+				case INTEGER:
+					configItemCommand.then(argument("int", IntegerArgumentType.integer()).executes(c -> setItemInteger(c, (ConfigItem<Integer>) item, group)));
+					break;
+				case STRING:
+					configItemCommand.then(argument("string", StringArgumentType.string()).executes(c -> setItemString(c, (ConfigItem<String>) item, group)));
+					break;
+				default:
+					break;
+				}
+				configGroupCommand.then(configItemCommand);
 			}
-			configGroupCommand.then(configItemCommand);
 		}
 		literalArgumentBuilder.then(configGroupCommand);
 	}
