@@ -26,7 +26,7 @@ dependencies {
 ```
 
 ## How to use
-The best way to use my config is to extend `com.oroarmor.config.Config` with your own class. Inside this class, you should include other classes that extend `com.oroarmor.config.ConfigItemGroup` for your config groups. See the [example](https://github.com/OroArmor/oro-config/tree/master/README.md#example) for a way to use the library.
+The best way to use my config is to extend `com.oroarmor.config.Config` with your own class. Inside this class, you should include other classes that extend `com.oroarmor.config.ConfigItemGroup` for your config groups. See the [example](#example) for a way to use the library.
 
 ### Config Item
 `ConfigItem`s are the main storage of the different values that make up your config. Currently the only supported types are `String`, `Double`, `Integer`, and `Boolean` (Technically `ConfigItemGroup`s, but those are extremely different). There are two constructors for `ConfigItem`:
@@ -69,7 +69,7 @@ Id is for the ID of the config which is used in commands and modmenu.
 `ModMenuConfigScreen` is an abstract class that requires you to extend it, passing in your config into a super constructor. Because this is used as an entry point, your constructor ***must*** have no parameters.
 
 ### Example:
-These are pulled from the testmod, and are part of this repositiory. [Test Mod](https://github.com/OroArmor/oro-config/tree/master/src/main/java/testmod)
+These are pulled from the testmod, and are part of this repositiory. [Test Mod](https://github.com/OroArmor/oro-config/tree/master/src/testmod)
 
 Config Class:
 ```java
