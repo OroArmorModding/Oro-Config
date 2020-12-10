@@ -4,7 +4,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import com.google.gson.Gson;
@@ -85,9 +88,15 @@ public class Config {
 		String[] splitPath = path.split("\\.");
 
 		ConfigItem<?> selectedItem = getConfigs().stream().filter(cig -> cig.name.equals(splitPath[0])).findFirst().get();
-		int index = 1;
-		while (selectedItem instanceof ConfigItemGroup) {
-			selectedItem = ((ConfigItemGroup) selectedItem).getConfigs().stream().filter(ci -> ci.name.equals(splitPath[index])).findFirst().get();
+		try {
+			LinkedList<String> paths = new LinkedList<>(Arrays.asList(splitPath));
+			while (selectedItem instanceof ConfigItemGroup) {
+				paths.removeFirst();
+				selectedItem = ((ConfigItemGroup) selectedItem).getConfigs().stream().filter(ci -> ci.name.equals(paths.getFirst())).findFirst().get();
+			}
+		} catch (NoSuchElementException e) {
+			System.err.printf("Path: %s does not exist\n", path);
+			return null;
 		}
 
 		boolean validType = false;
