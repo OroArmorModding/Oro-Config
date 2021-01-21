@@ -9,19 +9,22 @@ My goal in creating this library was to make an light-weight config library that
 ## How to include
 Include my library in your mod by adding it to your `build.gradle` file.
 
-Make sure jitpack is included in your repositiories section:
+Make sure my bintray repo is included in your repositiories section:
 ```
 repositories {
   maven {
-    url = "https://jitpack.io"
+    url = "https://dl.bintray.com/oroarmor/oroarmor"
   }
 }
 ```
 Then in your dependencies section add my library to the classpath and jar-in-jar it so that users dont have to download an extra file:
+
+The current version is: ![](https://img.shields.io/github/v/tag/oroarmor/oro-config.svg)
+
 ```
 dependencies {	
-  modImplementation 'com.github.OroArmor:oro-config:-SNAPSHOT'
-  include 'com.github.OroArmor:oro-config:-SNAPSHOT'
+  modImplementation 'com.github.OroArmor:oro-config:${version}'
+  include 'com.github.OroArmor:oro-config:${version}'
 }
 ```
 

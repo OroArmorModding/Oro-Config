@@ -17,7 +17,7 @@ public class OroConfigTestMod implements ModInitializer {
 
 		System.out.println(CONFIG);
 
-		CommandRegistrationCallback.EVENT.register(new ConfigCommand(CONFIG));
+		CommandRegistrationCallback.EVENT.register(new ConfigCommand(CONFIG)::register);
 	}
 
 }

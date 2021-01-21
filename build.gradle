@@ -1,6 +1,7 @@
 plugins {
 	id 'fabric-loom' version '0.5-SNAPSHOT'
 	id 'maven-publish'
+	id 'com.jfrog.bintray' version "1.8.4"
 }
 
 repositories {
@@ -28,31 +29,20 @@ task runTestmodClient(type: RunClientTask) {
 
 
 dependencies {
-
     //to change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    
 	// Fabric API. This is technically optional, but you probably want it anyway.
-    modCompile "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-
-//	[
-//		"fabric-api-base",
-//	    "fabric-command-api-v1",
-//	    "fabric-resource-loader-v0"
-//	].forEach {
-//	    modImplementation(fabricApi.module(it, project.fabric_version))
-//	}
+    testmodCompile "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
 	modCompile("io.github.prospector:modmenu:1.14.6+build.31") {
 		exclude(module: "fabric-api")
 	}
-	
-	modApi("me.shedaniel.cloth:config-2:4.8.3"){
+
+	modCompile("me.shedaniel.cloth:config-2:4.8.3") {
  		exclude(module: "fabric-api")
  	}
- 	
+
  	testImplementation 'junit:junit:4.13.1'
  	
  	testmodCompile sourceSets.main.output
@@ -101,6 +91,10 @@ publishing {
 			artifact(sourcesJar) {
 				builtBy remapSourcesJar
 			}
+
+			archivesBaseName = rootProject.archives_base_name
+			version = rootProject.mod_version
+			group = rootProject.maven_group
 		}
 	}
 
@@ -108,5 +102,22 @@ publishing {
 	repositories {
 		// uncomment to publish to the local maven
 		// mavenLocal()
+	}
+}
+
+bintray {
+	user = System.getenv('BINTRAY_USER')
+	key = System.getenv('BINTRAY_KEY')
+	publications = ["mavenJava"]
+	publish = true
+	pkg {
+		repo = 'oroarmor'
+		name = rootProject.archives_base_name
+		userOrg = "oroarmor"
+		licenses = ['CC0-1.0']
+		vcsUrl = 'https://github.com/OroArmor/Oro-Config.git'
+		version {
+			name = rootProject.mod_version
+		}
 	}
 }

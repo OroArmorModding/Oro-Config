@@ -16,7 +16,6 @@ import com.oroarmor.config.ConfigItem;
 import com.oroarmor.config.ConfigItemGroup;
 import com.oroarmor.config.ConfigItem.Type;
 
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.ClickEvent;
@@ -36,7 +35,7 @@ import net.minecraft.util.Util;
  * @author Eli Orona
  *
  */
-public class ConfigCommand implements CommandRegistrationCallback {
+public class ConfigCommand {
 
 	/**
 	 * The config
@@ -127,9 +126,8 @@ public class ConfigCommand implements CommandRegistrationCallback {
 		return 1;
 	}
 
-	@Override
 	public void register(CommandDispatcher<ServerCommandSource> dispatcher, boolean dedicated) {
-		LiteralArgumentBuilder<ServerCommandSource> literalArgumentBuilder = literal(config.getID()).requires(p -> p.hasPermissionLevel(2)).executes(c -> listConfigGroups(c));
+		LiteralArgumentBuilder<ServerCommandSource> literalArgumentBuilder = literal(config.getID()).requires(p -> p.hasPermissionLevel(2)).executes(this::listConfigGroups);
 
 		for (ConfigItemGroup group : config.getConfigs()) {
 			parseConfigItemGroupCommand(literalArgumentBuilder, group);
