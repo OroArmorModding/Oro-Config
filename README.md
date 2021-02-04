@@ -32,7 +32,7 @@ dependencies {
 The best way to use my config is to extend `com.oroarmor.config.Config` with your own class. Inside this class, you should include other classes that extend `com.oroarmor.config.ConfigItemGroup` for your config groups. See the [example](#example) for a way to use the library.
 
 ### Config Item
-`ConfigItem`s are the main storage of the different values that make up your config. Currently the only supported types are `String`, `Double`, `Integer`, and `Boolean` (Technically `ConfigItemGroup`s, but those are extremely different). There are two constructors for `ConfigItem`:
+`ConfigItem`s are the main storage of the different values that make up your config. Currently the only supported types are `String`, `Double`, `Integer`, `Boolean`, and all enums (Technically `ConfigItemGroup`s, but those are extremely different). There are two constructors for `ConfigItem`:
 ```java
 ConfigItem(String name, T defaultValue, String details)
 ```
@@ -77,37 +77,38 @@ These are pulled from the testmod, and are part of this repositiory. [Test Mod](
 Config Class:
 ```java
 public class TestConfig extends Config {
-  public static final ConfigItemGroup mainGroup = new ConfigGroupLevel1();
+    public static final ConfigItemGroup mainGroup = new ConfigGroupLevel1();
 
-  public static final List<ConfigItemGroup> configs = of(mainGroup);
+    public static final List<ConfigItemGroup> configs = of(mainGroup);
 
-  public TestConfig() {
-    super(configs, new File(FabricLoader.getInstance().getConfigDir().toFile(), "oroarmor_config_testmod.json"), "oroarmor_config_testmod");
-  }
+    public TestConfig() {
+        super(configs, new File(FabricLoader.getInstance().getConfigDir().toFile(), "oroarmor_config_testmod.json"), "oroarmor_config_testmod");
+    }
 
-  public static class ConfigGroupLevel1 extends ConfigItemGroup {
-    public static class NestedGroup extends ConfigItemGroup {
-      public static class TripleNested extends ConfigItemGroup {
-        public static final ConfigItem<String> testString = new ConfigItem<String>("test_string", "Default", "test_string");
+    public static class ConfigGroupLevel1 extends ConfigItemGroup {
+        public static final ConfigItem<EnumTest> testEnum = new ConfigItem<>("test_enum", EnumTest.A, "test_enum");
+        public static final ConfigItem<Boolean> testItem = new ConfigItem<Boolean>("test_boolean", true, "test_boolean");
 
-        public TripleNested() {
-          super(of(testString), "triple");
+        public ConfigGroupLevel1() {
+            super(of(new NestedGroup(), testItem, testEnum), "group");
         }
-      }
 
-      public static final ConfigItem<Integer> nestedItem = new ConfigItem<Integer>("test_int", 0, "test_integer");
+        public static class NestedGroup extends ConfigItemGroup {
+            public static final ConfigItem<Integer> nestedItem = new ConfigItem<Integer>("test_int", 0, "test_integer");
 
-      public NestedGroup() {
-        super(of(nestedItem, new TripleNested()), "nested");
-      }
+            public NestedGroup() {
+                super(of(nestedItem, new TripleNested()), "nested");
+            }
+
+            public static class TripleNested extends ConfigItemGroup {
+                public static final ConfigItem<String> testString = new ConfigItem<String>("test_string", "Default", "test_string");
+
+                public TripleNested() {
+                    super(of(testString), "triple");
+                }
+            }
+        }
     }
-
-    public static final ConfigItem<Boolean> testItem = new ConfigItem<Boolean>("test_boolean", true, "test_boolean");
-
-    public ConfigGroupLevel1() {
-      super(of(new NestedGroup(), testItem), "group");
-    }
-  }
 }
 ```
 This then creates a config file called `oroarmor_config_testmod.json` in the `/config/` directory wherever Minecraft is run:
@@ -120,14 +121,15 @@ This then creates a config file called `oroarmor_config_testmod.json` in the `/c
         "test_string": "Default"
       }
     },
-    "test_boolean": true
+    "test_boolean": true,
+    "test_enum": "A"
   }
 }
 ```
 
 Command Registration:
 ```java
-CommandRegistrationCallback.EVENT.register(new ConfigCommand(YOUR_CONFIG));
+CommandRegistrationCallback.EVENT.register(new ConfigCommand(YOUR_CONFIG)::register);
 ```
 
 Mod Menu Integration:
