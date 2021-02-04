@@ -23,8 +23,8 @@ The current version is: ![](https://img.shields.io/github/v/tag/oroarmor/oro-con
 
 ```
 dependencies {	
-  modImplementation 'com.github.OroArmor:oro-config:${version}'
-  include 'com.github.OroArmor:oro-config:${version}'
+  modImplementation 'com.oroarmor:oro-config:${version}'
+  include 'com.oroarmor:oro-config:${version}'
 }
 ```
 
