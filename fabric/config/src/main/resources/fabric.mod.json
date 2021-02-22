@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "oro_config",
+  "version": "${version}",
+  "name": "OroArmor Config",
+  "description": "This library adds simple configs to your mod, with support for mod menu and commands",
+  "authors": [
+    "OroArmor"
+  ],
+  "contact": {
+  },
+  "license": "CC0-1.0",
+  "icon": "oro-config_icon.jpg",
+  "environment": "*",
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "fabric-command-api-v1": "*"
+  },
+  "suggests": {
+    "flamingo": "*"
+  }
+}

@@ -1,0 +1,35 @@
+repositories {
+    maven { url "https://maven.shedaniel.me/" }
+}
+
+dependencies {
+    compile(project(":common:config"))
+    compile(project(":common:command"))
+    compile(project(":common:screen"))
+}
+
+architectury {
+    common()
+}
+
+java {
+    withSourcesJar()
+}
+
+publishing {
+    publications {
+        mavenCommon(MavenPublication) {
+            artifactId = rootProject.archives_base_name
+            // add all the jars that should be included when publishing to maven
+            artifact remapJar
+            artifact(sourcesJar) {
+                builtBy remapSourcesJar
+            }
+        }
+    }
+
+    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+    repositories {
+        // Add repositories to publish to here.
+    }
+}

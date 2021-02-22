@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "oro_config_testmod",
+  "version": "${version}",
+  "name": "OroArmor Config Test Mod",
+  "description": "Testmod for the config library",
+  "authors": [
+    "OroArmor"
+  ],
+  "license": "CC0-1.0",
+  "icon": "oro-config_icon.jpg",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.oroarmor.config.testmod.OroConfigTestMod"
+    ],
+    "modmenu": [
+      "com.oroarmor.config.testmod.ModMenuIntegration"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "fabric": "*"
+  },
+  "suggests": {
+    "flamingo": "*"
+  }
+}

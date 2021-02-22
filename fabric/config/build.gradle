@@ -1,0 +1,79 @@
+plugins {
+    id "com.github.johnrengelman.shadow" version "5.0.0"
+}
+
+repositories {
+    maven {
+        url = "https://jitpack.io"
+    }
+}
+
+architectury {
+    platformSetupLoomIde()
+//    fabric()
+}
+
+dependencies {
+    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+//    include(modImplementation(fabricApi.module("fabric-command-api-v1", project.fabric_version)))
+
+    compileOnly(project(path: ":common:config")) {
+    }
+    runtimeOnly(project(path: ":common:config")) {
+    }
+    shadow(project(path: ":common:config", configuration: "transformProductionFabric")) {
+    }
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
+shadowJar {
+//    configurations = [project.configurations.shadowCommon]
+    classifier "dev-shadow"
+}
+
+remapJar {
+    input.set shadowJar.archiveFile
+    dependsOn shadowJar
+    classifier "fabric"
+}
+
+jar {
+    classifier "dev"
+}
+
+java {
+    withSourcesJar()
+}
+
+sourcesJar {
+    def commonSources = project(":common:config").remapSourcesJar
+    dependsOn commonSources
+    from zipTree(commonSources.output)
+}
+
+publishing {
+    publications {
+        mavenFabric(MavenPublication) {
+            artifactId = rootProject.archives_base_name + "-" + project.name
+            // add all the jars that should be included when publishing to maven
+            artifact(remapJar) {
+                classifier null
+            }
+            artifact(sourcesJar) {
+                builtBy remapSourcesJar
+            }
+        }
+    }
+
+    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+    repositories {
+        // Add repositories to publish to here.
+    }
+}
