@@ -1,0 +1,16 @@
+plugins {
+    id "forgified-fabric-loom"
+}
+
+architectury {
+    common()
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
+    mappings "net.fabricmc:yarn:1.16.5+build.4"
+}
+
+archivesBaseName = rootProject.archives_base_name + "-config"
+version = rootProject.mod_version
+group = rootProject.maven_group

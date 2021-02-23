@@ -1,11 +1,17 @@
+plugins {
+    id "forgified-fabric-loom"
+}
+
 repositories {
     maven { url "https://maven.shedaniel.me/" }
 }
 
 dependencies {
-    compile(project(":common:config"))
-    compile(project(":common:command"))
-    compile(project(":common:screen"))
+    minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
+    mappings "net.fabricmc:yarn:1.16.5+build.4"
+    compile(project(":config"))
+    compile(project(":common-command"))
+    compile(project(":common-screen"))
 }
 
 architectury {

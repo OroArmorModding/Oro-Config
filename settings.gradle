@@ -7,16 +7,16 @@ pluginManagement {
     }
 }
 
-include("common:config")
-include("common:command")
-include("common:screen")
-include("common:testmod")
+include("config")
+include("common-command")
+include("common-screen")
+include("common-testmod")
 
-include("fabric:config")
+include("fabric-config")
 //include("fabric:command")
-include("fabric:screen")
-include("fabric:testmod")
+include("fabric-screen")
+include("fabric-testmod")
 
 //include("forge")
 
-rootProject.name = "architectury-example-mod"
+rootProject.name = "oro-config"

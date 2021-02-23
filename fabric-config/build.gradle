@@ -1,5 +1,6 @@
 plugins {
     id "com.github.johnrengelman.shadow" version "5.0.0"
+    id "forgified-fabric-loom"
 }
 
 repositories {
@@ -10,18 +11,16 @@ repositories {
 
 architectury {
     platformSetupLoomIde()
-//    fabric()
 }
 
 dependencies {
+    minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
+    mappings "net.fabricmc:yarn:1.16.5+build.4"
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
 //    include(modImplementation(fabricApi.module("fabric-command-api-v1", project.fabric_version)))
 
-    compileOnly(project(path: ":common:config")) {
-    }
-    runtimeOnly(project(path: ":common:config")) {
-    }
-    shadow(project(path: ":common:config", configuration: "transformProductionFabric")) {
+    shadow(project(path: ":config")) {
+        transitive(false)
     }
 }
 
@@ -34,7 +33,7 @@ processResources {
 }
 
 shadowJar {
-//    configurations = [project.configurations.shadowCommon]
+    configurations = [project.configurations.shadow]
     classifier "dev-shadow"
 }
 
@@ -50,12 +49,6 @@ jar {
 
 java {
     withSourcesJar()
-}
-
-sourcesJar {
-    def commonSources = project(":common:config").remapSourcesJar
-    dependsOn commonSources
-    from zipTree(commonSources.output)
 }
 
 publishing {
