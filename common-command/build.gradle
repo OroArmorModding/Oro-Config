@@ -8,9 +8,7 @@ repositories {
 }
 
 dependencies {
-    minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
-    mappings "net.fabricmc:yarn:1.16.5+build.4"
-    shadow(compile(project(":config")))
+    shadow(compile(project(":common")))
 }
 
 architectury {

@@ -7,9 +7,7 @@ repositories {
 }
 
 dependencies {
-    minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
-    mappings "net.fabricmc:yarn:1.16.5+build.4"
-    compile(project(":config"))
+    compile(project(":common"))
     compile(project(":common-command"))
     compile(project(":common-screen"))
 }

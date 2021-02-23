@@ -9,14 +9,16 @@ repositories {
     }
 }
 
+configurations {
+    shadowCommonScreen
+}
+
 architectury {
     platformSetupLoomIde()
-//    fabric()
+    fabric()
 }
 
 dependencies {
-    minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
-    mappings "net.fabricmc:yarn:1.16.5+build.4"
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
     // Remove the next line if you don't want to depend on the API
 
@@ -26,11 +28,11 @@ dependencies {
     runtimeOnly(project(path: ":common-screen")) {
         transitive = false
     }
-    shadow(project(path: ":common-screen", configuration: "transformProductionFabric")) {
+    shadowCommonScreen(project(path: ":common-screen", configuration: "transformProductionFabric")) {
         transitive = false
     }
 
-    shadow(project(path: ":config"))
+    shadow(project(path: ":common"))
 
     modApi("io.github.prospector:modmenu:1.14.6+build.31") {
         exclude(module: "fabric-api")
@@ -46,7 +48,7 @@ processResources {
 }
 
 shadowJar {
-//    configurations = [project.configurations.shadowCommon]
+    configurations = [project.configurations.shadowCommonScreen]
     classifier "dev-shadow"
 }
 
@@ -65,7 +67,7 @@ java {
 }
 
 sourcesJar {
-    def commonSources = project(":config").remapSourcesJar
+    def commonSources = project(":common").remapSourcesJar
     dependsOn commonSources
     from zipTree(commonSources.output)
 }
