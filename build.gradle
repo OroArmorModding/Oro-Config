@@ -1,13 +1,7 @@
-buildscript {
-    dependencies {
-        classpath "org.ow2.asm:asm-tree:9.0"
-    }
-}
-
 plugins {
     id "java"
-    id "architectury-plugin" version "3.0.84"
-    id "forgified-fabric-loom" version "0.6.69" apply false
+    id "architectury-plugin" version "3.0.93"
+    id "forgified-fabric-loom" version "0.6.72" apply false
 }
 
 architectury {
@@ -18,13 +12,12 @@ subprojects {
     apply plugin: "forgified-fabric-loom"
 
     loom {
-
+        useFabricMixin = true
     }
 
     dependencies {
         minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
         mappings "net.fabricmc:yarn:1.16.5+build.4"
-        implementation "org.ow2.asm:asm-tree:9.0"
     }
 }
 
