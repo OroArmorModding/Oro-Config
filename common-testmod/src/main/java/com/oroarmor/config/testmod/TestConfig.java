@@ -6,11 +6,8 @@ import java.util.List;
 import com.oroarmor.config.Config;
 import com.oroarmor.config.ConfigItem;
 import com.oroarmor.config.ConfigItemGroup;
-import me.shedaniel.architectury.Architectury;
-import me.shedaniel.architectury.PlatformMethods;
 import me.shedaniel.architectury.platform.Platform;
 
-import net.fabricmc.loader.api.FabricLoader;
 import static com.google.common.collect.ImmutableList.of;
 
 public class TestConfig extends Config {

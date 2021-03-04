@@ -9,6 +9,7 @@ import net.minecraftforge.fml.common.Mod;
 public class OroConfigTestMod {
     public OroConfigTestMod() {
         TestMod.initialize();
+
         ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.CONFIGGUIFACTORY, () -> new ForgeConfigScreen(TestMod.CONFIG));
     }
 }

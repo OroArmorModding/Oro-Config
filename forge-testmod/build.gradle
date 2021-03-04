@@ -44,7 +44,7 @@ dependencies {
         transitive(false)
     }
 
-    modRuntime("me.shedaniel.cloth:cloth-config-forge:4.11.14")
+    modImplementation("me.shedaniel.cloth:cloth-config-forge:4.11.14")
 }
 
 processResources {

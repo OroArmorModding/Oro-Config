@@ -2,15 +2,13 @@ package com.oroarmor.config.screen;
 
 
 import com.oroarmor.config.Config;
-import com.oroarmor.config.screen.ConfigScreen;
+import com.terraformersmc.modmenu.api.ConfigScreenFactory;
+import com.terraformersmc.modmenu.api.ModMenuApi;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 
 import net.minecraft.text.TranslatableText;
-
-import io.github.prospector.modmenu.api.ConfigScreenFactory;
-import io.github.prospector.modmenu.api.ModMenuApi;
 
 /**
  * This class allows for the easy addition of a Mod Menu config screen to your

@@ -12,7 +12,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.TranslatableText;
 
 public class ForgeConfigScreen extends ConfigScreen implements BiFunction<MinecraftClient, Screen, Screen> {
-     public ForgeConfigScreen(Config config) {
+    public ForgeConfigScreen(Config config) {
         super(config);
     }
 

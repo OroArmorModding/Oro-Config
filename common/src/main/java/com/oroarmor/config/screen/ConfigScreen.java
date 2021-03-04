@@ -6,8 +6,6 @@ import java.util.stream.Collectors;
 import com.oroarmor.config.Config;
 import com.oroarmor.config.ConfigItem;
 import com.oroarmor.config.ConfigItemGroup;
-//import io.github.prospector.modmenu.api.ConfigScreenFactory;
-//import io.github.prospector.modmenu.api.ModMenuApi;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
@@ -31,7 +29,7 @@ import net.minecraft.text.TranslatableText;
  *
  * @author Eli Orona
  */
-public abstract class ConfigScreen  {
+public abstract class ConfigScreen {
 
     /**
      * The config for the screen

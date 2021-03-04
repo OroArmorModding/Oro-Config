@@ -26,3 +26,10 @@ mandatory = true
 versionRange = "[1.1.55,)"
 ordering = "AFTER"
 side = "BOTH"
+
+[[dependencies.oroconfig-testmod]]
+modId = "cloth-config"
+mandatory = true
+versionRange = "[4.11.14,)"
+ordering = "AFTER"
+side = "CLIENT"
