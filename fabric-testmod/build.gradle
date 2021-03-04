@@ -1,0 +1,97 @@
+plugins {
+    id "com.github.johnrengelman.shadow" version "5.0.0"
+    id "forgified-fabric-loom"
+}
+
+repositories {
+    maven {
+        url = "https://maven.terraformersmc.com/releases/"
+    }
+}
+
+configurations {
+    shadowCommonTestmod
+}
+
+
+architectury {
+    platformSetupLoomIde()
+    fabric()
+}
+
+dependencies {
+    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+    // Remove the next line if you don't want to depend on the API
+
+    compileOnly(project(path: ":common-testmod")) {
+        transitive = false
+    }
+    runtimeOnly(project(path: ":common-testmod")) {
+        transitive = false
+    }
+    compileOnly(project(path: ":common")) {
+        transitive = false
+    }
+    runtimeOnly(project(path: ":common")) {
+        transitive = false
+    }
+
+    implementation(project(":fabric"))
+
+    modRuntime("com.terraformersmc:modmenu:1.16.8")
+    modApi "me.shedaniel:architectury-fabric:${rootProject.architectury_version}"
+    modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
+shadowJar {
+    configurations = [project.configurations.shadowCommonTestmod]
+    classifier "dev-shadow"
+}
+
+remapJar {
+    input.set shadowJar.archiveFile
+    dependsOn shadowJar
+    classifier "fabric-testmod"
+}
+
+jar {
+    classifier "dev"
+}
+
+java {
+    withSourcesJar()
+}
+
+sourcesJar {
+    def commonSources = project(":common").remapSourcesJar
+    dependsOn commonSources
+    from zipTree(commonSources.output)
+}
+
+publishing {
+    publications {
+        mavenFabric(MavenPublication) {
+            artifactId = rootProject.archives_base_name + "-" + project.name
+            // add all the jars that should be included when publishing to maven
+            artifact(remapJar) {
+                classifier null
+            }
+            artifact(sourcesJar) {
+                builtBy remapSourcesJar
+            }
+        }
+    }
+
+    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+    repositories {
+        // Add repositories to publish to here.
+    }
+}

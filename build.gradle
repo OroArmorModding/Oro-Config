@@ -1,125 +1,52 @@
 plugins {
-	id 'fabric-loom' version '0.6-SNAPSHOT'
-	id 'maven-publish'
-	id 'com.jfrog.bintray' version "1.8.4"
+    id "java"
+    id "architectury-plugin" version "3.0.93"
+    id "forgified-fabric-loom" version "0.6.72" apply false
 }
 
-repositories {
-	jcenter()    
-    maven {
-		url = "https://jitpack.io"
-	}
+architectury {
+    minecraft = rootProject.minecraft_version
 }
 
-project.version = project.mod_version
+subprojects {
+    apply plugin: "forgified-fabric-loom"
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
+    loom {
+        useFabricMixin = true
+    }
 
-sourceSets {
-	testmod {
-		compileClasspath += main.compileClasspath
-		runtimeClasspath += main.runtimeClasspath
-	}
+    dependencies {
+        minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
+        mappings "net.fabricmc:yarn:1.16.5+build.4"
+    }
+
+    remapJar {
+        classifier project.name
+    }
 }
 
-import net.fabricmc.loom.task.RunClientTask
+allprojects {
+    apply plugin: "java"
+    apply plugin: "architectury-plugin"
+    apply plugin: "maven-publish"
 
-task runTestmodClient(type: RunClientTask) {
-	classpath sourceSets.testmod.runtimeClasspath
-}
+    archivesBaseName = rootProject.archives_base_name
+    version = rootProject.mod_version
+    group = rootProject.maven_group
 
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
 
-dependencies {
-    //to change the versions see the gradle.properties file
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
-	// Fabric API. This is technically optional, but you probably want it anyway.
-	include(modImplementation(fabricApi.module("fabric-command-api-v1", project.fabric_version)))
+        // The Minecraft launcher currently installs Java 8 for users, so your mod probably wants to target Java 8 too
+        // JDK 9 introduced a new way of specifying this that will make sure no newer classes or methods are used.
+        // We'll use that if it's available, but otherwise we'll use the older option.
+        def targetVersion = 8
+        if (JavaVersion.current().isJava9Compatible()) {
+            options.release = targetVersion
+        }
+    }
 
-	modCompile("io.github.prospector:modmenu:1.14.6+build.31") {
-		exclude(module: "fabric-api")
-	}
-
-	modCompile("me.shedaniel.cloth:config-2:4.8.3") {
- 		exclude(module: "fabric-api")
- 	}
-
- 	testImplementation 'junit:junit:4.13.1'
- 	
- 	testmodCompile sourceSets.main.output
-}
-
-processResources {
-	inputs.property "version", project.version
-
-	from(sourceSets.main.resources.srcDirs) {
-		include "fabric.mod.json"
-		expand "version": project.mod_version
-	}
-
-	from(sourceSets.main.resources.srcDirs) {
-		exclude "fabric.mod.json"
-	}
-}
-
-// ensure that the encoding is set to UTF-8, no matter what the system default is
-// this fixes some edge cases with special characters not displaying correctly
-// see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
-tasks.withType(JavaCompile) {
-	options.encoding = "UTF-8"
-}
-
-// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
-// if it is present.
-// If you remove this task, sources will not be generated.
-task sourcesJar(type: Jar, dependsOn: classes) {
-	classifier = "sources"
-	from sourceSets.main.allSource
-}
-
-jar {
-	from "LICENSE"
-}
-
-// configure the maven publication
-publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			// add all the jars that should be included when publishing to maven
-			artifact(remapJar) {
-				builtBy remapJar
-			}
-			artifact(sourcesJar) {
-				builtBy remapSourcesJar
-			}
-
-			archivesBaseName = rootProject.archives_base_name
-			version = rootProject.mod_version
-			group = rootProject.maven_group
-		}
-	}
-
-	// select the repositories you want to publish to
-	repositories {
-		// uncomment to publish to the local maven
-		// mavenLocal()
-	}
-}
-
-bintray {
-	user = System.getenv('BINTRAY_USER')
-	key = System.getenv('BINTRAY_KEY')
-	publications = ["mavenJava"]
-	publish = true
-	pkg {
-		repo = 'oroarmor'
-		name = rootProject.archives_base_name
-		userOrg = "oroarmor"
-		licenses = ['CC0-1.0']
-		vcsUrl = 'https://github.com/OroArmor/Oro-Config.git'
-		version {
-			name = rootProject.mod_version
-		}
-	}
+    java {
+        withSourcesJar()
+    }
 }

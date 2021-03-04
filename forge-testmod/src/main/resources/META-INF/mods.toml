@@ -1,0 +1,35 @@
+modLoader = "javafml"
+loaderVersion = "[35,)"
+#issueTrackerURL = ""
+license = "CCO 1.0"
+
+[[mods]]
+modId = "oroconfig-testmod"
+version = "${version}"
+displayName = "Oro Config"
+authors = "OroArmor"
+description = '''
+This library adds simple configs to your mod
+'''
+logoFile = "oro-config.png"
+
+[[dependencies.oroconfig-testmod]]
+modId = "forge"
+mandatory = true
+versionRange = "[35,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.oroconfig-testmod]]
+modId = "architectury"
+mandatory = true
+versionRange = "[1.1.55,)"
+ordering = "AFTER"
+side = "BOTH"
+
+[[dependencies.oroconfig-testmod]]
+modId = "cloth-config"
+mandatory = true
+versionRange = "[4.11.14,)"
+ordering = "AFTER"
+side = "CLIENT"

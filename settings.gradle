@@ -1,10 +1,18 @@
 pluginManagement {
     repositories {
-        jcenter()
-        maven {
-            name = 'Fabric'
-            url = 'https://maven.fabricmc.net/'
-        }
+        maven { url "https://maven.fabricmc.net/" }
+        maven { url "https://maven.shedaniel.me/" }
+        maven { url "https://files.minecraftforge.net/maven/" }
         gradlePluginPortal()
     }
 }
+
+include("common")
+include("fabric")
+include("forge")
+
+include("common-testmod")
+include("fabric-testmod")
+include("forge-testmod")
+
+rootProject.name = "oro-config"
