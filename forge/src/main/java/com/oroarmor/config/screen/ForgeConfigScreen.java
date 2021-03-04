@@ -7,15 +7,17 @@ import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.TranslatableText;
 
-public class ForgeConfigScreen extends ConfigScreen {
+public class ForgeConfigScreen extends ConfigScreen implements BiFunction<MinecraftClient, Screen, Screen> {
      public ForgeConfigScreen(Config config) {
         super(config);
     }
 
-    public Screen apply(Screen screen) {
+    @Override
+    public Screen apply(MinecraftClient minecraftClient, Screen screen) {
         ConfigBuilder builder = ConfigBuilder.create().setParentScreen(screen).setTitle(new TranslatableText("config." + config.getID()));
         builder.setSavingRunnable(config::saveConfigToFile);
 
