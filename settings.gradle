@@ -8,15 +8,11 @@ pluginManagement {
 }
 
 include("common")
-include("common-command")
-//include("common-screen")
-//include("common-testmod")
+include("fabric")
+include("forge")
 
-include("fabric-config")
-//include("fabric:command")
-//include("fabric-screen")
-//include("fabric-testmod")
-
-//include("forge")
+include("common-testmod")
+include("fabric-testmod")
+include("forge-testmod")
 
 rootProject.name = "oro-config"

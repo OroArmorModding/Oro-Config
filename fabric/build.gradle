@@ -2,45 +2,52 @@ plugins {
     id "com.github.johnrengelman.shadow" version "5.0.0"
 }
 
-configurations {
-    shadowCommon // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
-    dev
+repositories {
+    maven {
+        url = "https://maven.terraformersmc.com/releases/"
+    }
 }
 
 architectury {
     platformSetupLoomIde()
-    forge()
+    fabric()
 }
 
-loom {
-    useFabricMixin = true
-}
-
-artifacts {
-    dev(jar)
+configurations {
+    shadowCommon
 }
 
 dependencies {
-    forge "net.minecraftforge:forge:${rootProject.minecraft_version}-${rootProject.forge_version}"
-    // Remove the next line if you don't want to depend on the API
-    modApi "me.shedaniel:architectury-forge:${rootProject.architectury_version}"
+    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
 
     implementation(project(path: ":common")) {
         transitive = false
     }
-    developmentForge(project(path: ":common")) {
+    developmentFabric(project(path: ":common")) {
         transitive = false
     }
-    shadowCommon(project(path: ":common", configuration: "transformProductionForge")) {
+    shadowCommon(project(path: ":common", configuration: "transformProductionFabric")) {
         transitive = false
     }
 
-    modApi("me.shedaniel.cloth:cloth-config-forge:4.11.14")
+    modApi("com.terraformersmc:modmenu:1.16.8") {
+        exclude(module: "fabric-api")
+    }
+
+    include(modApi("me.shedaniel.cloth:cloth-config-fabric:4.11.14")) {
+        exclude(group: "net.fabricmc.fabric-api")
+    }
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
 }
 
 shadowJar {
-    exclude "fabric.mod.json"
-
     configurations = [project.configurations.shadowCommon]
     classifier "dev-shadow"
 }
@@ -48,7 +55,7 @@ shadowJar {
 remapJar {
     input.set shadowJar.archiveFile
     dependsOn shadowJar
-    classifier "forge"
+    classifier "fabric"
 }
 
 jar {
@@ -59,15 +66,9 @@ java {
     withSourcesJar()
 }
 
-sourcesJar {
-    def commonSources = project(":common").remapSourcesJar
-    dependsOn commonSources
-    from zipTree(commonSources.output)
-}
-
 publishing {
     publications {
-        mavenForge(MavenPublication) {
+        mavenFabric(MavenPublication) {
             artifactId = rootProject.archives_base_name + "-" + project.name
             // add all the jars that should be included when publishing to maven
             artifact(remapJar) {

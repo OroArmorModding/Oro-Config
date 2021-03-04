@@ -19,6 +19,10 @@ subprojects {
         minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
         mappings "net.fabricmc:yarn:1.16.5+build.4"
     }
+
+    remapJar {
+        classifier project.name
+    }
 }
 
 allprojects {

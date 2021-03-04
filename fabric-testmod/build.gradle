@@ -5,7 +5,7 @@ plugins {
 
 repositories {
     maven {
-        url = "https://jitpack.io"
+        url = "https://maven.terraformersmc.com/releases/"
     }
 }
 
@@ -29,11 +29,18 @@ dependencies {
     runtimeOnly(project(path: ":common-testmod")) {
         transitive = false
     }
-    shadowCommonTestmod(project(path: ":common-testmod", configuration: "transformProductionFabric")) {
+    compileOnly(project(path: ":common")) {
+        transitive = false
+    }
+    runtimeOnly(project(path: ":common")) {
         transitive = false
     }
 
-    shadow(project(path: ":fabric-screen"))
+    implementation(project(":fabric"))
+
+    modRuntime("com.terraformersmc:modmenu:1.16.8")
+    modApi "me.shedaniel:architectury-fabric:${rootProject.architectury_version}"
+    modApi "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
 }
 
 processResources {
@@ -52,7 +59,7 @@ shadowJar {
 remapJar {
     input.set shadowJar.archiveFile
     dependsOn shadowJar
-    classifier "fabric"
+    classifier "fabric-testmod"
 }
 
 jar {
