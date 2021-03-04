@@ -11,7 +11,6 @@ include("common")
 include("fabric")
 include("forge")
 
-include("common-testmod")
 include("fabric-testmod")
 include("forge-testmod")
 
