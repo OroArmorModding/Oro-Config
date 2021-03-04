@@ -1,61 +1,77 @@
 plugins {
     id "com.github.johnrengelman.shadow" version "5.0.0"
-    id "forgified-fabric-loom"
-}
-
-repositories {
-    maven {
-        url = "https://jitpack.io"
-    }
 }
 
 configurations {
-    shadowCommonScreen
+    shadowCommon // Don't use shadow from the shadow plugin because we don't want IDEA to index this.
 }
 
 architectury {
     platformSetupLoomIde()
-    fabric()
+    forge()
+}
+
+loom {
+    useFabricMixin = true
 }
 
 dependencies {
-    modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
+    forge "net.minecraftforge:forge:${rootProject.minecraft_version}-${rootProject.forge_version}"
     // Remove the next line if you don't want to depend on the API
+    modApi "me.shedaniel:architectury-forge:${rootProject.architectury_version}"
 
-    compileOnly(project(path: ":common-screen")) {
+    implementation(project(path: ":common-testmod")) {
         transitive = false
     }
-    runtimeOnly(project(path: ":common-screen")) {
+    developmentForge(project(path: ":common-testmod")) {
         transitive = false
     }
-    shadowCommonScreen(project(path: ":common-screen", configuration: "transformProductionFabric")) {
+    shadowCommon(project(path: ":common-testmod", configuration: "transformProductionForge")) {
         transitive = false
     }
 
-    shadow(project(path: ":common"))
-
-    modApi("io.github.prospector:modmenu:1.14.6+build.31") {
-        exclude(module: "fabric-api")
+    implementation(project(path: ":common")) {
+        transitive = false
     }
+    developmentForge(project(path: ":common")) {
+        transitive = false
+    }
+    shadowCommon(project(path: ":common", configuration: "transformProductionForge")) {
+        transitive = false
+    }
+
+    shadow(implementation(project(path: ":forge", configuration: "dev"))) {
+        transitive(false)
+    }
+
+    modRuntime("me.shedaniel.cloth:cloth-config-forge:4.11.14")
 }
 
 processResources {
     inputs.property "version", project.version
 
-    filesMatching("fabric.mod.json") {
+    filesMatching("META-INF/mods.toml") {
         expand "version": project.version
     }
 }
 
 shadowJar {
-    configurations = [project.configurations.shadowCommonScreen]
+    exclude "fabric.mod.json"
+
+    configurations = [project.configurations.shadow, project.configurations.shadowCommon]
     classifier "dev-shadow"
 }
 
 remapJar {
     input.set shadowJar.archiveFile
     dependsOn shadowJar
-    classifier "fabric"
+    classifier "forge-testmod"
+}
+
+runClient {
+    inputs.with {
+        shadowJar.archiveFile
+    }
 }
 
 jar {
@@ -74,7 +90,7 @@ sourcesJar {
 
 publishing {
     publications {
-        mavenFabric(MavenPublication) {
+        mavenForge(MavenPublication) {
             artifactId = rootProject.archives_base_name + "-" + project.name
             // add all the jars that should be included when publishing to maven
             artifact(remapJar) {
