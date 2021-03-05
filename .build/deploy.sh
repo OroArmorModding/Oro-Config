@@ -22,6 +22,6 @@ gpg --fast-import --no-tty --batch --yes eliorona-sign.asc
 
 echo "📦 Publishing..."
 
-./gradlew uploadArchives
+./gradlew uploadArchives -Psign=true
 
 echo "✅ Done!"

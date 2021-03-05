@@ -17,6 +17,10 @@ configurations {
     shadowCommon
 }
 
+archivesBaseName = rootProject.archives_base_name + "-fabric"
+version = rootProject.mod_version
+group = rootProject.maven_group
+
 dependencies {
     modImplementation "net.fabricmc:fabric-loader:${rootProject.fabric_loader_version}"
 
@@ -55,7 +59,6 @@ shadowJar {
 remapJar {
     input.set shadowJar.archiveFile
     dependsOn shadowJar
-    classifier "fabric"
 }
 
 jar {
@@ -75,7 +78,6 @@ sourcesJar {
 publishing {
     publications {
         mavenFabric(MavenPublication) {
-            artifactId = rootProject.archives_base_name + "-" + project.name
             // add all the jars that should be included when publishing to maven
             artifact(remapJar) {
                 classifier null

@@ -22,12 +22,8 @@ subprojects {
         mappings "net.fabricmc:yarn:1.16.5+build.4"
     }
 
-    remapJar {
-        classifier project.name
-    }
-
     task sourceJar(type: Jar) {
-        classifier project.name + "-sources"
+        classifier "sources"
         from sourceSets.main.allSource
     }
 
@@ -42,12 +38,13 @@ subprojects {
     }
 
     tasks.withType(Sign) {
-        onlyIf { gradle.taskGraph.hasTask("publish") && project.hasProperty("sign") }
+        onlyIf { project.hasProperty("sign") }
     }
+
+    println(project.hasProperty("sign"))
 
     if(project.hasProperty("sign")) {
         signing {
-            required { gradle.taskGraph.hasTask("publish") && project.hasProperty("sign") }
             useGpgCmd()
             sign configurations.archives
         }
