@@ -32,16 +32,12 @@ subprojects {
     }
 
     artifacts {
-        archives remapJar, javadocJar
-        if (!project.name.contains("common"))
-            archives sourceJar
+        archives remapJar, javadocJar, sourceJar
     }
 
     tasks.withType(Sign) {
         onlyIf { project.hasProperty("sign") }
     }
-
-    println(project.hasProperty("sign"))
 
     if(project.hasProperty("sign")) {
         signing {
