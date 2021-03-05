@@ -26,7 +26,7 @@ dependencies {
         transitive = false
     }
 
-    modImplementation(project(path: ":forge")) {
+    modImplementation(project(path: ":forge", configuration: "dev")) {
         transitive(false)
     }
 
@@ -70,24 +70,4 @@ sourcesJar {
     def commonSources = project(":common").remapSourcesJar
     dependsOn commonSources
     from zipTree(commonSources.output)
-}
-
-publishing {
-    publications {
-        mavenForge(MavenPublication) {
-            artifactId = rootProject.archives_base_name + "-" + project.name
-            // add all the jars that should be included when publishing to maven
-            artifact(remapJar) {
-                classifier null
-            }
-            artifact(sourcesJar) {
-                builtBy remapSourcesJar
-            }
-        }
-    }
-
-    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-    repositories {
-        // Add repositories to publish to here.
-    }
 }

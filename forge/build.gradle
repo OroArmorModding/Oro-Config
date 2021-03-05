@@ -56,7 +56,7 @@ remapJar {
 }
 
 jar {
-    classifier "dev-forge"
+    classifier "dev"
 
     manifest {
         getAttributes()["FMLModType"] = "LIBRARY"
@@ -83,6 +83,9 @@ publishing {
             }
             artifact(sourcesJar) {
                 builtBy remapSourcesJar
+            }
+            artifact(javadocJar) {
+                builtBy javadocJar
             }
         }
     }

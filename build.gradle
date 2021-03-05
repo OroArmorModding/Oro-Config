@@ -10,6 +10,8 @@ architectury {
 
 subprojects {
     apply plugin: "forgified-fabric-loom"
+    apply plugin: "signing"
+    apply plugin: "maven"
 
     loom {
         useFabricMixin = true
@@ -22,6 +24,83 @@ subprojects {
 
     remapJar {
         classifier project.name
+    }
+
+    task sourceJar(type: Jar) {
+        classifier project.name + "-sources"
+        from sourceSets.main.allSource
+    }
+
+    task javadocJar(type: Jar) {
+        classifier "javadoc"
+    }
+
+    artifacts {
+        archives remapJar, javadocJar
+        if (!project.name.contains("common"))
+            archives sourceJar
+    }
+
+    tasks.withType(Sign) {
+        onlyIf { gradle.taskGraph.hasTask("publish") && project.hasProperty("sign") }
+    }
+
+    if(project.hasProperty("sign")) {
+        signing {
+            required { gradle.taskGraph.hasTask("publish") && project.hasProperty("sign") }
+            useGpgCmd()
+            sign configurations.archives
+        }
+    }
+
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                def ossrhUsername = "OroArmor"
+                def ossrhPassword = project.hasProperty("ossrhPassword") ? project.property("ossrhPassword") : System.getenv("OSSRH_PASSWORD")
+
+                beforeDeployment {
+                    MavenDeployment deployment -> signing.signPom(deployment)
+                }
+
+                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
+                }
+
+                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                    authentication(userName: ossrhUsername, password: ossrhPassword)
+                }
+
+                pom.project {
+                    name 'OroConfig'
+                    packaging 'jar'
+                    description 'A simple Minecraft Config Library'
+                    url 'http://github.com/OroArmor/Oro-Config'
+
+                    scm {
+                        connection 'scm:git:git://github.com/OroArmor/Oro-Config.git'
+                        developerConnection 'scm:git:ssh://github.com:OroArmor/Oro-Config.git'
+                        url 'http://github.com/OroArmor/Oro-Config'
+                    }
+
+                    licenses {
+                        license {
+                            name 'CC0 1.0'
+                            url 'https://creativecommons.org/publicdomain/zero/1.0/legalcode'
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id 'OroArmor'
+                            name 'Eli Orona'
+                            email 'eliorona@live.com'
+                            url "oroarmor.com"
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -49,4 +128,9 @@ allprojects {
     java {
         withSourcesJar()
     }
+}
+
+
+task publishToMavenCentral {
+
 }
