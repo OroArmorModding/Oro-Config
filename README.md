@@ -71,7 +71,11 @@ The details are a string representing a language key that can be used in your la
 
 The second constructor has an `onChange` parameter, which is a Consumer that is run every time this config is changed, which can be used to send data to clients on servers or trigger other events.
 
-You can get the value from a `ConfigItem` with the `get` method.
+You can get the value from a `ConfigItem` with the `getValue` method.
+
+#### Array Config Items
+
+`ArrayConfigItem`s are exactly the same as normal config items, but have a couple useful methods to get values based on their index. You cannot nest `ArrayConfigItem`s inside other `ArrayConfigItem`s
 
 ### Config Item Groups
 `ConfigItemGroup`s are a way to store multiple `ConfigItem`s into one group. `ConfigItemGroup`s can be nested in each other for sub groups. There is one constructor:
@@ -117,21 +121,23 @@ public class TestConfig extends Config {
 
     public static class ConfigGroupLevel1 extends ConfigItemGroup {
         public static final ConfigItem<EnumTest> testEnum = new ConfigItem<>("test_enum", EnumTest.A, "test_enum");
-        public static final ConfigItem<Boolean> testItem = new ConfigItem<Boolean>("test_boolean", true, "test_boolean");
+        public static final ConfigItem<Boolean> testItem = new ConfigItem<>("test_boolean", true, "test_boolean");
+
+        public static final ArrayConfigItem<Integer> testArray = new ArrayConfigItem<>("test_array", new Integer[]{1, 2, 3}, "test_array");
 
         public ConfigGroupLevel1() {
-            super(of(new NestedGroup(), testItem, testEnum), "group");
+            super(of(new NestedGroup(), testItem, testEnum, testArray), "group");
         }
 
         public static class NestedGroup extends ConfigItemGroup {
-            public static final ConfigItem<Integer> nestedItem = new ConfigItem<Integer>("test_int", 0, "test_integer");
+            public static final ConfigItem<Integer> nestedItem = new ConfigItem<>("test_int", 0, "test_integer");
 
             public NestedGroup() {
                 super(of(nestedItem, new TripleNested()), "nested");
             }
 
             public static class TripleNested extends ConfigItemGroup {
-                public static final ConfigItem<String> testString = new ConfigItem<String>("test_string", "Default", "test_string");
+                public static final ConfigItem<String> testString = new ConfigItem<>("test_string", "Default", "test_string");
 
                 public TripleNested() {
                     super(of(testString), "triple");
@@ -152,7 +158,12 @@ This then creates a config file called `oroarmor_config_testmod.json` in the `/c
       }
     },
     "test_boolean": true,
-    "test_enum": "A"
+    "test_enum": "A",
+    "test_array": [
+      1,
+      2,
+      3
+    ]
   }
 }
 ```

@@ -27,6 +27,7 @@ package com.oroarmor.config.testmod;
 import java.io.File;
 import java.util.List;
 
+import com.oroarmor.config.ArrayConfigItem;
 import com.oroarmor.config.Config;
 import com.oroarmor.config.ConfigItem;
 import com.oroarmor.config.ConfigItemGroup;
@@ -47,8 +48,10 @@ public class TestConfig extends Config {
         public static final ConfigItem<EnumTest> testEnum = new ConfigItem<>("test_enum", EnumTest.A, "test_enum");
         public static final ConfigItem<Boolean> testItem = new ConfigItem<>("test_boolean", true, "test_boolean");
 
+        public static final ArrayConfigItem<Integer> testArray = new ArrayConfigItem<>("test_array", new Integer[]{1, 2, 3}, "test_array");
+
         public ConfigGroupLevel1() {
-            super(of(new NestedGroup(), testItem, testEnum), "group");
+            super(of(new NestedGroup(), testItem, testEnum, testArray), "group");
         }
 
         public static class NestedGroup extends ConfigItemGroup {

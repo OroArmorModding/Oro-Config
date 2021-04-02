@@ -38,5 +38,7 @@ public class OroConfigTestMod implements ModInitializer {
         CONFIG.readConfigFromFile();
         ServerLifecycleEvents.SERVER_STOPPED.register(instance -> CONFIG.saveConfigToFile());
         CommandRegistrationCallback.EVENT.register(new ConfigCommand(CONFIG)::register);
+
+        CONFIG.saveConfigToFile();
     }
 }

@@ -210,8 +210,11 @@ public class ConfigItem<T> {
                 return ENUM;
             }
 
+            if (value != null && value.getClass().isArray()) {
+                return getTypeFrom(((Object[]) value)[0]);
+            }
+
             return null;
         }
-
     }
 }

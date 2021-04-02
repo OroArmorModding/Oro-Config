@@ -1,7 +1,7 @@
 modLoader = "javafml"
 loaderVersion = "[35,)"
 #issueTrackerURL = ""
-license = "CCO 1.0"
+license = "MIT"
 
 [[mods]]
 modId = "oroconfig-testmod"

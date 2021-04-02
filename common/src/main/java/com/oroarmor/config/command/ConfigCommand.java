@@ -24,14 +24,18 @@
 
 package com.oroarmor.config.command;
 
+import java.util.Arrays;
+
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.oroarmor.config.ArrayConfigItem;
 import com.oroarmor.config.Config;
 import com.oroarmor.config.ConfigItem;
 import com.oroarmor.config.ConfigItem.Type;
@@ -86,6 +90,35 @@ public class ConfigCommand {
         return configListText;
     }
 
+    protected MutableText createArrayItemText(ArrayConfigItem<?> item, ConfigItemGroup group) {
+        MutableText configListText = new LiteralText("");
+        boolean atDefault = Arrays.equals(item.getDefaultValue(), item.getValue());
+        configListText.append(new LiteralText("[" + I18n.translate(item.getDetails()) + "]"));
+        configListText.append(" : ");
+
+        StringBuilder array = new StringBuilder();
+        for (int i = 0; i < item.getValue().length; i++) {
+            if (i != 0) {
+                array.append(", ");
+            }
+            array.append(item.getValue(i));
+        }
+
+        StringBuilder defaultArray = new StringBuilder();
+        for (int i = 0; i < item.getDefaultValue().length; i++) {
+            if (i != 0) {
+                defaultArray.append(", ");
+            }
+            defaultArray.append(item.getDefaultValue(i));
+        }
+
+        configListText.append(new LiteralText("[" + array.toString() + "]")
+                .formatted(atDefault ? Formatting.GREEN : Formatting.DARK_GREEN)
+                .styled(s -> s.withHoverEvent(new HoverEvent(Action.SHOW_TEXT, new LiteralText((atDefault ? "At Default " : "") + "Value: " + (atDefault ? defaultArray.toString() + ". Click to change value." : array.toString() + ". Click to reset value."))))
+                        .withClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/" + config.getID() + " " + group.getName() + " " + item.getName() + " " + (atDefault ? "value" : item.getDefaultValue())))));
+        return configListText;
+    }
+
     private int listConfigGroup(CommandContext<ServerCommandSource> c, ConfigItemGroup group) {
         MutableText configList = new LiteralText("");
 
@@ -135,7 +168,7 @@ public class ConfigCommand {
             }
             configList.append(padding + "/\n");
         } else {
-            configList.append(createItemText(item, group));
+            configList.append(item instanceof ArrayConfigItem ? createArrayItemText((ArrayConfigItem<?>) item, group) : createItemText(item, group));
             configList.append("\n");
         }
     }
@@ -169,28 +202,57 @@ public class ConfigCommand {
             } else {
                 LiteralArgumentBuilder<ServerCommandSource> configItemCommand = literal(item.getName()).executes((c) -> listItem(c, item, group));
 
-                switch (item.getType()) {
-                    case BOOLEAN:
-                        configItemCommand.then(argument("boolean", BoolArgumentType.bool()).executes(c -> setItemBoolean(c, (ConfigItem<Boolean>) item, group)));
-                        break;
-                    case DOUBLE:
-                        configItemCommand.then(argument("double", DoubleArgumentType.doubleArg()).executes(c -> setItemDouble(c, (ConfigItem<Double>) item, group)));
-                        break;
-                    case INTEGER:
-                        configItemCommand.then(argument("int", IntegerArgumentType.integer()).executes(c -> setItemInteger(c, (ConfigItem<Integer>) item, group)));
-                        break;
-                    case STRING:
-                        configItemCommand.then(argument("string", StringArgumentType.string()).executes(c -> setItemString(c, (ConfigItem<String>) item, group)));
-                        break;
-                    case ENUM:
-                        Enum<?>[] enums = ((Enum<?>) item.getValue()).getClass().getEnumConstants();
-                        for (Enum<?> _enum : enums) {
-                            configItemCommand.then(literal(_enum.toString()).executes(c -> setItemEnum(c, _enum, (ConfigItem<Enum<?>>) item, group)));
-                        }
-                        break;
+                if (item instanceof ArrayConfigItem) {
+                    RequiredArgumentBuilder<ServerCommandSource, Integer> arrayIndex = argument("index", IntegerArgumentType.integer(0, ((ArrayConfigItem<?>) item).getValue().length));
 
-                    default:
-                        break;
+                    switch (item.getType()) {
+                        case BOOLEAN:
+                            arrayIndex.then(argument("boolean", BoolArgumentType.bool()).executes(c -> setArrayItemBoolean(c, (ArrayConfigItem<Boolean>) item, group)));
+                            break;
+                        case DOUBLE:
+                            arrayIndex.then(argument("double", DoubleArgumentType.doubleArg()).executes(c -> setArrayItemDouble(c, (ArrayConfigItem<Double>) item, group)));
+                            break;
+                        case INTEGER:
+                            arrayIndex.then(argument("int", IntegerArgumentType.integer()).executes(c -> setArrayItemInteger(c, (ArrayConfigItem<Integer>) item, group)));
+                            break;
+                        case STRING:
+                            arrayIndex.then(argument("string", StringArgumentType.string()).executes(c -> setArrayItemString(c, (ArrayConfigItem<String>) item, group)));
+                            break;
+                        case ENUM:
+                            Enum<?>[] enums = ((Enum<?>) item.getValue()).getClass().getEnumConstants();
+                            for (Enum<?> _enum : enums) {
+                                arrayIndex.then(literal(_enum.toString()).executes(c -> setArrayItemEnum(c, _enum, (ArrayConfigItem<Enum<?>>) item, group)));
+                            }
+                            break;
+
+                        default:
+                            break;
+                    }
+                    configItemCommand.then(arrayIndex);
+                } else {
+                    switch (item.getType()) {
+                        case BOOLEAN:
+                            configItemCommand.then(argument("boolean", BoolArgumentType.bool()).executes(c -> setItemBoolean(c, (ConfigItem<Boolean>) item, group)));
+                            break;
+                        case DOUBLE:
+                            configItemCommand.then(argument("double", DoubleArgumentType.doubleArg()).executes(c -> setItemDouble(c, (ConfigItem<Double>) item, group)));
+                            break;
+                        case INTEGER:
+                            configItemCommand.then(argument("int", IntegerArgumentType.integer()).executes(c -> setItemInteger(c, (ConfigItem<Integer>) item, group)));
+                            break;
+                        case STRING:
+                            configItemCommand.then(argument("string", StringArgumentType.string()).executes(c -> setItemString(c, (ConfigItem<String>) item, group)));
+                            break;
+                        case ENUM:
+                            Enum<?>[] enums = ((Enum<?>) item.getValue()).getClass().getEnumConstants();
+                            for (Enum<?> _enum : enums) {
+                                configItemCommand.then(literal(_enum.toString()).executes(c -> setItemEnum(c, _enum, (ConfigItem<Enum<?>>) item, group)));
+                            }
+                            break;
+
+                        default:
+                            break;
+                    }
                 }
                 configGroupCommand.then(configItemCommand);
             }
@@ -224,6 +286,41 @@ public class ConfigCommand {
 
     protected <T> int setAndSaveConfig(CommandContext<ServerCommandSource> c, ConfigItem<T> item, T result) {
         item.setValue(result);
+        config.saveConfigToFile();
+        return 1;
+    }
+
+    protected int setArrayItemBoolean(CommandContext<ServerCommandSource> c, ArrayConfigItem<Boolean> item, ConfigItemGroup group) {
+        int index = IntegerArgumentType.getInteger(c, "index");
+        boolean result = BoolArgumentType.getBool(c, "boolean");
+        return setArrayAndSaveConfig(c, item, result, index);
+    }
+
+    protected int setArrayItemDouble(CommandContext<ServerCommandSource> c, ArrayConfigItem<Double> item, ConfigItemGroup group) {
+        int index = IntegerArgumentType.getInteger(c, "index");
+        double result = DoubleArgumentType.getDouble(c, "double");
+        return setArrayAndSaveConfig(c, item, result, index);
+    }
+
+    protected int setArrayItemInteger(CommandContext<ServerCommandSource> c, ArrayConfigItem<Integer> item, ConfigItemGroup group) {
+        int index = IntegerArgumentType.getInteger(c, "index");
+        int result = IntegerArgumentType.getInteger(c, "int");
+        return setArrayAndSaveConfig(c, item, result, index);
+    }
+
+    private int setArrayItemString(CommandContext<ServerCommandSource> c, ArrayConfigItem<String> item, ConfigItemGroup group) {
+        int index = IntegerArgumentType.getInteger(c, "index");
+        String result = StringArgumentType.getString(c, "string");
+        return setArrayAndSaveConfig(c, item, result, index);
+    }
+
+    private int setArrayItemEnum(CommandContext<ServerCommandSource> c, Enum<?> _enum, ArrayConfigItem<Enum<?>> item, ConfigItemGroup group) {
+        int index = IntegerArgumentType.getInteger(c, "index");
+        return setArrayAndSaveConfig(c, item, _enum, index);
+    }
+
+    protected <T> int setArrayAndSaveConfig(CommandContext<ServerCommandSource> c, ArrayConfigItem<T> item, T result, int index) {
+        item.setValue(result, index);
         config.saveConfigToFile();
         return 1;
     }

@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.StringJoiner;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
@@ -112,6 +113,40 @@ public class ConfigItemGroup extends ConfigItem<ConfigItemGroup> {
     }
 
     /**
+     * Turns an array config into a json property
+     *
+     * @param c      The array config item
+     * @param object the json object
+     */
+    private void parseArrayConfig(ArrayConfigItem<?> c, JsonObject object) {
+        JsonArray array = new JsonArray();
+
+        for (int i = 0; i < c.getValue().length; i++) {
+            switch (c.getType()) {
+                case BOOLEAN:
+                    array.add((Boolean) c.getValue(i));
+                    break;
+                case DOUBLE:
+                case INTEGER:
+                    array.add((Number) c.getValue(i));
+                    break;
+                case STRING:
+                    array.add((String) c.getValue(i));
+                    break;
+                case ENUM:
+                    array.add(c.getValue(i).toString());
+                    break;
+                case GROUP:
+                    array.add(((ConfigItemGroup) c.getValue(i)).toJson());
+                default:
+                    break;
+            }
+        }
+
+        object.add(c.getName(), array);
+    }
+
+    /**
      * Converts the config items into json
      *
      * @return A {@link JsonObject} of this group
@@ -120,7 +155,10 @@ public class ConfigItemGroup extends ConfigItem<ConfigItemGroup> {
         JsonObject object = new JsonObject();
 
         for (ConfigItem<?> c : configs) {
-            parseConfig(c, object);
+            if (!(c instanceof ArrayConfigItem))
+                parseConfig(c, object);
+            else
+                parseArrayConfig((ArrayConfigItem<?>) c, object);
         }
 
         return object;
