@@ -3,7 +3,7 @@ IFS=$'\n\t'
 
 function cleanup {
 	    echo "🧹 Cleanup..."
-	        rm -f gradle.properties eliorona-sign.asc
+	        rm -f ~/.gradle/gradle.properties eliorona-sign.asc
 	}
 
 trap cleanup SIGINT SIGTERM ERR EXIT
@@ -15,13 +15,16 @@ echo "🔑 Decrypting files..."
 gpg --quiet --batch --yes --decrypt --passphrase="${GPG_SECRET}" \
 	    --output eliorona-sign.asc .build/eliorona-sign.asc.gpg
 
+mkdir ~/.gradle
+
 gpg --quiet --batch --yes --decrypt --passphrase="${GPG_SECRET}" \
-	    --output gradle.properties .build/gradle.properties.gpg
+	    --output ~/.gradle/gradle.properties .build/usrgradle.properties.gpg
 
 gpg --fast-import --no-tty --batch --yes eliorona-sign.asc
 
 echo "📦 Publishing..."
 
-./gradlew uploadArchives -Psign=true
+./gradlew build
+./gradlew uploadArchives -Psign
 
 echo "✅ Done!"

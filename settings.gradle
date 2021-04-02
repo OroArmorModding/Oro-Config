@@ -11,7 +11,7 @@ include("common")
 include("fabric")
 include("forge")
 
-//include("fabric-testmod")
-//include("forge-testmod")
+include("fabric-testmod")
+include("forge-testmod")
 
 rootProject.name = "oro-config"

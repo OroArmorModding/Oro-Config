@@ -2,6 +2,7 @@ plugins {
     id "java"
     id "architectury-plugin" version "3.0.93"
     id "forgified-fabric-loom" version "0.6.72" apply false
+    id 'org.cadixdev.licenser' version '0.5.0' apply false
 }
 
 architectury {
@@ -12,6 +13,7 @@ subprojects {
     apply plugin: "forgified-fabric-loom"
     apply plugin: "signing"
     apply plugin: "maven"
+    apply plugin: 'org.cadixdev.licenser'
 
     loom {
         useFabricMixin = true
@@ -20,6 +22,10 @@ subprojects {
     dependencies {
         minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
         mappings "net.fabricmc:yarn:1.16.5+build.4"
+    }
+
+    license {
+        header = rootProject.file("LICENSE")
     }
 
     task sourceJar(type: Jar) {
@@ -78,8 +84,8 @@ subprojects {
 
                     licenses {
                         license {
-                            name 'CC0 1.0'
-                            url 'https://creativecommons.org/publicdomain/zero/1.0/legalcode'
+                            name 'MIT'
+                            url 'https://mit-license.org/'
                         }
                     }
 

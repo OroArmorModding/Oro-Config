@@ -9,22 +9,45 @@ My goal in creating this library was to make an light-weight config library that
 ## How to include
 Include my library in your mod by adding it to your `build.gradle` file.
 
-Make sure my bintray repo is included in your repositiories section:
+Make sure maven central is included in your repositiories section:
 ```
 repositories {
-  maven {
-    url = "https://dl.bintray.com/oroarmor/oroarmor"
-  }
+  mavenCentral()
 }
 ```
-Then in your dependencies section add my library to the classpath and jar-in-jar it so that users dont have to download an extra file:
 
 The current version is: ![](https://img.shields.io/github/v/tag/oroarmor/oro-config.svg)
 
+### Fabric
+
+Then in your dependencies section add my library to the classpath and jar-in-jar it so that users don't have to download an extra file:
+
 ```
 dependencies {	
-  modImplementation 'com.oroarmor:oro-config:${version}'
-  include 'com.oroarmor:oro-config:${version}'
+  modImplementation 'com.oroarmor:oro-config-fabric:${version}'
+  include 'com.oroarmor:oro-config-fabric:${version}'
+}
+```
+
+### Forge
+
+Then in your dependencies section add my library to the classpath and shadow it so that users don't have to download an extra file:
+
+```
+dependencies {	
+  modImplementation 'com.oroarmor:oro-config-forge:${version}'
+  shadow 'com.oroarmor:oro-config-forge:${version}'
+}
+```
+
+### Outside of minecraft
+
+Then in your dependencies section add my library to the classpath and shadow it so that users don't have to download an extra file:
+
+```
+dependencies {	
+  modImplementation 'com.oroarmor:oro-config-common:${version}'
+  shadow 'com.oroarmor:oro-config-common:${version}'
 }
 ```
 
@@ -48,6 +71,8 @@ The details are a string representing a language key that can be used in your la
 
 The second constructor has an `onChange` parameter, which is a Consumer that is run every time this config is changed, which can be used to send data to clients on servers or trigger other events.
 
+You can get the value from a `ConfigItem` with the `get` method.
+
 ### Config Item Groups
 `ConfigItemGroup`s are a way to store multiple `ConfigItem`s into one group. `ConfigItemGroup`s can be nested in each other for sub groups. There is one constructor:
 ```java
@@ -68,11 +93,16 @@ Id is for the ID of the config which is used in commands and modmenu.
 ### Command
 `ConfigCommand` is a simple class that ust requires a `Config` in its constructor. It does not handle its own registering, and must be registered through Fabric API
 
+The command is currently broken for forge
+
 ### Cloth Config
 `ModMenuConfigScreen` is an abstract class that requires you to extend it, passing in your config into a super constructor. Because this is used as an entry point, your constructor ***must*** have no parameters.
 
+### Forge Config Screen
+Currently broken
+
 ### Example:
-These are pulled from the testmod, and are part of this repositiory. [Test Mod](https://github.com/OroArmor/oro-config/tree/master/src/testmod)
+These are pulled from the testmod, and are part of this repositiory. [Test Mod](https://github.com/OroArmor/oro-config/tree/master/fabric-testmod/src/main)
 
 Config Class:
 ```java
@@ -127,7 +157,7 @@ This then creates a config file called `oroarmor_config_testmod.json` in the `/c
 }
 ```
 
-Command Registration:
+Fabric Command Registration:
 ```java
 CommandRegistrationCallback.EVENT.register(new ConfigCommand(YOUR_CONFIG)::register);
 ```
