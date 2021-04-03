@@ -24,11 +24,14 @@
 
 package com.oroarmor.config;
 
-import java.util.Arrays;
 import java.util.function.Consumer;
 
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.mojang.brigadier.builder.ArgumentBuilder;
 import org.jetbrains.annotations.Nullable;
+
+import net.minecraft.command.CommandSource;
 
 /**
  * {@link ConfigItem} often stores a name and a value for saving data into a
@@ -39,11 +42,10 @@ import org.jetbrains.annotations.Nullable;
  * @param <T>
  * @author Eli Orona
  */
-public class ConfigItem<T> {
+public abstract class ConfigItem<T> {
     protected final String name;
     protected final String details;
     protected final T defaultValue;
-    protected final Type type;
     @Nullable
     protected final Consumer<ConfigItem<T>> onChange;
     protected T value;
@@ -76,7 +78,6 @@ public class ConfigItem<T> {
         this.details = details;
         this.defaultValue = defaultValue;
         this.value = defaultValue;
-        this.type = Type.getTypeFrom(defaultValue);
         this.onChange = onChange;
     }
 
@@ -86,42 +87,9 @@ public class ConfigItem<T> {
      *
      * @param element The JSON Element
      */
-    @SuppressWarnings("unchecked")
-    public void fromJson(JsonElement element) {
-        T newValue;
+    public abstract void fromJson(JsonElement element);
 
-        switch (this.type) {
-            case BOOLEAN:
-                newValue = (T) (Object) element.getAsBoolean();
-                break;
-
-            case INTEGER:
-                newValue = (T) (Object) element.getAsInt();
-                break;
-
-            case DOUBLE:
-                newValue = (T) (Object) element.getAsDouble();
-                break;
-
-            case STRING:
-                newValue = (T) element.getAsString();
-                break;
-
-            case ENUM:
-                newValue = (T) Arrays.stream(((T) defaultValue).getClass().getEnumConstants()).filter(val -> val.toString().equals(element.getAsString())).findFirst().get();
-                break;
-
-            case GROUP:
-                ((ConfigItemGroup) defaultValue).fromJson(element.getAsJsonObject());
-
-            default:
-                return;
-        }
-
-        if (newValue != null) {
-            setValue(newValue);
-        }
-    }
+    public abstract void toJson(JsonObject object);
 
     /**
      * @return The default value of the {@link ConfigItem}
@@ -142,13 +110,6 @@ public class ConfigItem<T> {
      */
     public String getName() {
         return name;
-    }
-
-    /**
-     * @return The type of the {@link ConfigItem}
-     */
-    public Type getType() {
-        return type;
     }
 
     /**
@@ -175,46 +136,60 @@ public class ConfigItem<T> {
         return name + ":" + value;
     }
 
-    /**
-     * The current types for the config items
-     *
-     * @author Eli Orona
-     */
-    public enum Type {
-        BOOLEAN, INTEGER, DOUBLE, STRING, GROUP, ENUM;
+    public abstract <T1> boolean isValidType(Class<T1> clazz);
 
-        /**
-         * Gets the corresponding type for an object. If the object's type is not
-         * supported, this returns null.
-         *
-         * @param value The object to find the type for
-         * @return The type for that object
-         */
-        public static Type getTypeFrom(Object value) {
-            if (value instanceof Boolean) {
-                return BOOLEAN;
-            }
-            if (value instanceof Integer) {
-                return INTEGER;
-            }
-            if (value instanceof Double) {
-                return DOUBLE;
-            }
-            if (value instanceof String) {
-                return STRING;
-            }
-            if (value instanceof ConfigItemGroup) {
-                return GROUP;
-            }
-            if (value instanceof Enum) {
-                return ENUM;
-            }
+    public abstract <S extends CommandSource> ArgumentBuilder<?, ?> getSetCommand(ConfigItemGroup group, Config config);
 
-            if (value != null && value.getClass().isArray()) {
-                return getTypeFrom(((Object[]) value)[0]);
-            }
+    public abstract String getCommandValue();
 
-            return null;
-        }
+    public boolean atDefaultValue() {
+        return this.value.equals(this.defaultValue);
     }
+
+    public String getCommandDefaultValue() {
+        return this.value.toString();
+    }
+
+//    /**
+//     * The current types for the config items
+//     *
+//     * @author Eli Orona
+//     */
+//    public enum Type {
+//        BOOLEAN, INTEGER, DOUBLE, STRING, GROUP, ENUM;
+//
+//        /**
+//         * Gets the corresponding type for an object. If the object's type is not
+//         * supported, this returns null.
+//         *
+//         * @param value The object to find the type for
+//         * @return The type for that object
+//         */
+//        public static Type getTypeFrom(Object value) {
+//            if (value instanceof Boolean) {
+//                return BOOLEAN;
+//            }
+//            if (value instanceof Integer) {
+//                return INTEGER;
+//            }
+//            if (value instanceof Double) {
+//                return DOUBLE;
+//            }
+//            if (value instanceof String) {
+//                return STRING;
+//            }
+//            if (value instanceof ConfigItemGroup) {
+//                return GROUP;
+//            }
+//            if (value instanceof Enum) {
+//                return ENUM;
+//            }
+//
+//            if (value != null && value.getClass().isArray()) {
+//                return getTypeFrom(((Object[]) value)[0]);
+//            }
+//
+//            return null;
+//        }
+//    }
 }

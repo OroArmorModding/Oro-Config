@@ -123,33 +123,8 @@ public class Config {
             return null;
         }
 
-        boolean validType = false;
-
-        switch (selectedItem.getType()) {
-            case BOOLEAN:
-                validType = clazz == Boolean.class;
-                break;
-            case DOUBLE:
-                validType = clazz == Double.class;
-                break;
-            case GROUP:
-                validType = clazz == ConfigItemGroup.class;
-                break;
-            case INTEGER:
-                validType = clazz == Integer.class;
-                break;
-            case ENUM:
-                validType = clazz.isEnum();
-                break;
-            case STRING:
-                validType = clazz == String.class;
-                break;
-            default:
-                break;
-        }
-
-        if (!validType) {
-            throw new IllegalArgumentException("Incorrect type " + clazz.getName() + " for " + path + ". Correct type is " + selectedItem.getType());
+        if (!selectedItem.isValidType(clazz)) {
+            throw new IllegalArgumentException("Incorrect type " + clazz.getName() + " for " + path + ". Correct class is " + selectedItem.getValue().getClass().getSimpleName());
         }
 
         return ((ConfigItem<T>) selectedItem).getValue();
@@ -161,7 +136,7 @@ public class Config {
     public void saveConfigToFile() {
         JsonObject object = new JsonObject();
         for (ConfigItemGroup c : configs) {
-            object.add(c.getName(), c.toJson());
+           c.toJson(object);
         }
 
         try (FileOutputStream stream = new FileOutputStream(configFile)) {

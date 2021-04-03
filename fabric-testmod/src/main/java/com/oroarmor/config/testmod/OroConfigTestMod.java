@@ -27,6 +27,8 @@ package com.oroarmor.config.testmod;
 import com.oroarmor.config.Config;
 import com.oroarmor.config.command.ConfigCommand;
 
+import net.minecraft.server.command.ServerCommandSource;
+
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -37,7 +39,7 @@ public class OroConfigTestMod implements ModInitializer {
     public void onInitialize() {
         CONFIG.readConfigFromFile();
         ServerLifecycleEvents.SERVER_STOPPED.register(instance -> CONFIG.saveConfigToFile());
-        CommandRegistrationCallback.EVENT.register(new ConfigCommand(CONFIG)::register);
+        CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> new ConfigCommand<ServerCommandSource>(CONFIG).register(dispatcher, p -> p.hasPermissionLevel(2)));
 
         CONFIG.saveConfigToFile();
     }

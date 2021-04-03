@@ -35,6 +35,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 
 import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.command.ServerCommandSource;
 
 @Mod("oroconfig-testmod")
 public class OroConfigTestMod {
@@ -52,6 +53,6 @@ public class OroConfigTestMod {
     }
 
     public static void registerCommandEvent(RegisterCommandsEvent event) {
-        new ConfigCommand(CONFIG).register(event.getDispatcher(), event.getEnvironment() == CommandManager.RegistrationEnvironment.DEDICATED);
+        new ConfigCommand<ServerCommandSource>(CONFIG).register(event.getDispatcher(), c -> c.hasPermissionLevel(2));
     }
 }

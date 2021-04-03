@@ -26,9 +26,25 @@ package com.oroarmor.config;
 
 import java.util.Arrays;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.DoubleArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.ArgumentBuilder;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import org.jetbrains.annotations.Nullable;
+
+import net.minecraft.command.CommandSource;
+
+import static com.mojang.brigadier.builder.LiteralArgumentBuilder.literal;
+
 
 /**
  * {@link ArrayConfigItem} stores an array of the supported types <br>
@@ -65,7 +81,7 @@ public class ArrayConfigItem<T> extends ConfigItem<T[]> {
      */
     public ArrayConfigItem(String name, T[] defaultValue, String details, @Nullable Consumer<ConfigItem<T[]>> onChange) {
         super(name, defaultValue, details, onChange);
-        if(defaultValue[0] instanceof ArrayConfigItem) {
+        if (defaultValue[0] instanceof ArrayConfigItem) {
             throw new UnsupportedOperationException("ArrayConfigItems cannot be nested");
         }
         this.value = Arrays.copyOf(defaultValue, defaultValue.length);
@@ -79,32 +95,29 @@ public class ArrayConfigItem<T> extends ConfigItem<T[]> {
      */
     @SuppressWarnings("unchecked")
     public void fromJson(JsonElement element) {
-        for(int i = 0; i < element.getAsJsonArray().size(); i++) {
+        for (int i = 0; i < element.getAsJsonArray().size(); i++) {
             T newValue;
             JsonElement arrayElement = element.getAsJsonArray().get(i);
-            switch (this.type) {
-                case BOOLEAN:
+            switch (defaultValue[0].getClass().isEnum() ? "ENUM" : defaultValue[0].getClass().getSimpleName().toUpperCase()) {
+                case "BOOLEAN":
                     newValue = (T) (Object) arrayElement.getAsBoolean();
                     break;
 
-                case INTEGER:
+                case "INTEGER":
                     newValue = (T) (Object) arrayElement.getAsInt();
                     break;
 
-                case DOUBLE:
+                case "DOUBLE":
                     newValue = (T) (Object) arrayElement.getAsDouble();
                     break;
 
-                case STRING:
+                case "STRING":
                     newValue = (T) arrayElement.getAsString();
                     break;
 
-                case ENUM:
+                case "ENUM":
                     newValue = (T) Arrays.stream(((T) defaultValue[i]).getClass().getEnumConstants()).filter(val -> val.toString().equals(arrayElement.getAsString())).findFirst().get();
                     break;
-
-                case GROUP:
-                    ((ConfigItemGroup) defaultValue[i]).fromJson(arrayElement.getAsJsonObject());
 
                 default:
                     return;
@@ -114,6 +127,122 @@ public class ArrayConfigItem<T> extends ConfigItem<T[]> {
         if (value != null) {
             setValue(value);
         }
+    }
+
+    @Override
+    public void toJson(JsonObject object) {
+        JsonArray array = new JsonArray();
+        for (T t : value) {
+            JsonElement element;
+            switch (defaultValue[0].getClass().isEnum() ? "ENUM" : defaultValue[0].getClass().getSimpleName().toUpperCase()) {
+                case "BOOLEAN":
+                    element = new JsonPrimitive((Boolean) t);
+                    break;
+
+                case "INTEGER":
+                case "DOUBLE":
+                    element = new JsonPrimitive((Number) t);
+                    break;
+
+                case "STRING":
+                    element = new JsonPrimitive((String) t);
+                    break;
+
+                case "ENUM":
+                    element = new JsonPrimitive(t.toString());
+                    break;
+
+                default:
+                    return;
+            }
+
+            array.add(element);
+        }
+
+        object.add(this.name, array);
+    }
+
+    @Override
+    public boolean atDefaultValue() {
+        return Arrays.equals(defaultValue, value);
+    }
+
+    @Override
+    public <S> boolean isValidType(Class<S> clazz) {
+        return clazz == defaultValue[0].getClass();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <S extends CommandSource> ArgumentBuilder<?, ?> getSetCommand(ConfigItemGroup group, Config config) {
+        ArgumentBuilder<S, ?> setCommand;
+            switch (defaultValue[0].getClass().isEnum() ? "ENUM" : defaultValue[0].getClass().getSimpleName().toUpperCase()) {
+                case "BOOLEAN":
+                    setCommand = RequiredArgumentBuilder.<S, Boolean>argument("boolean", BoolArgumentType.bool()).executes(c -> {
+                        boolean result = BoolArgumentType.getBool(c, "boolean");
+                        int index = IntegerArgumentType.getInteger(c, "index");
+                        this.setValue((T) (Object) result, index);
+                        config.saveConfigToFile();
+                        return 1;
+                    });
+                    break;
+
+                case "INTEGER":
+                    setCommand = RequiredArgumentBuilder.<S, Integer>argument("int", IntegerArgumentType.integer()).executes(c -> {
+                        int result = IntegerArgumentType.getInteger(c, "int");
+                        int index = IntegerArgumentType.getInteger(c, "index");
+                        this.setValue((T) (Object) result, index);
+                        config.saveConfigToFile();
+                        return 1;
+                    });
+                    break;
+                case "DOUBLE":
+                    setCommand = RequiredArgumentBuilder.<S, Double>argument("double", DoubleArgumentType.doubleArg()).executes(c -> {
+                        double result = DoubleArgumentType.getDouble(c, "double");
+                        int index = IntegerArgumentType.getInteger(c, "index");
+                        this.setValue((T) (Object) result, index);
+                        config.saveConfigToFile();
+                        return 1;
+                    });
+                    break;
+
+                case "STRING":
+                    setCommand = RequiredArgumentBuilder.<S, String>argument("string", StringArgumentType.greedyString()).executes(c -> {
+                        String result = StringArgumentType.getString(c, "string");
+                        int index = IntegerArgumentType.getInteger(c, "index");
+                        this.setValue((T) result, index);
+                        config.saveConfigToFile();
+                        return 1;
+                    });
+                    break;
+
+                case "ENUM":
+                    setCommand = literal("set");
+                    Enum<?>[] enums = ((Enum<?>) this.getValue()[0]).getClass().getEnumConstants();
+                    for (Enum<?> _enum : enums) {
+                        setCommand.then(LiteralArgumentBuilder.<S>literal(_enum.toString()).executes(c -> {
+                            int index = IntegerArgumentType.getInteger(c, "index");
+                            this.setValue((T) _enum, index);
+                            config.saveConfigToFile();
+                            return 1;
+                        }));
+                    }
+                    break;
+
+                default:
+                    throw new IllegalStateException("Class " + defaultValue[0].getClass().getSimpleName() + " is an unsupported type");
+            }
+        return RequiredArgumentBuilder.<S, Integer>argument("index", IntegerArgumentType.integer(0, this.value.length)).then(setCommand);
+    }
+
+    @Override
+    public String getCommandValue() {
+        return Arrays.stream(this.value).map(Object::toString).collect(Collectors.joining(","));
+    }
+
+    @Override
+    public String getCommandDefaultValue() {
+        return Arrays.stream(this.defaultValue).map(Object::toString).collect(Collectors.joining(","));
     }
 
     /**

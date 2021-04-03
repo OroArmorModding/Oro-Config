@@ -29,9 +29,11 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.StringJoiner;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.mojang.brigadier.builder.ArgumentBuilder;
+
+import net.minecraft.command.CommandSource;
 
 /**
  * Extending {@link ConfigItem}, {@link ConfigItemGroup} can store multiple
@@ -39,7 +41,7 @@ import com.google.gson.JsonObject;
  *
  * @author Eli Orona
  */
-public class ConfigItemGroup extends ConfigItem<ConfigItemGroup> {
+public class ConfigItemGroup extends ConfigItem<ConfigItem<?>> {
 
     /**
      * The list of {@link ConfigItem}
@@ -85,83 +87,16 @@ public class ConfigItemGroup extends ConfigItem<ConfigItemGroup> {
     }
 
     /**
-     * Turns a config into a json property
-     *
-     * @param c      The config item
-     * @param object the json object
-     */
-    private void parseConfig(ConfigItem<?> c, JsonObject object) {
-        switch (c.getType()) {
-            case BOOLEAN:
-                object.addProperty(c.getName(), (Boolean) c.getValue());
-                break;
-            case DOUBLE:
-            case INTEGER:
-                object.addProperty(c.getName(), (Number) c.getValue());
-                break;
-            case STRING:
-                object.addProperty(c.getName(), (String) c.getValue());
-                break;
-            case ENUM:
-                object.addProperty(c.getName(), c.getValue().toString());
-                break;
-            case GROUP:
-                object.add(c.getName(), ((ConfigItemGroup) c).toJson());
-            default:
-                break;
-        }
-    }
-
-    /**
-     * Turns an array config into a json property
-     *
-     * @param c      The array config item
-     * @param object the json object
-     */
-    private void parseArrayConfig(ArrayConfigItem<?> c, JsonObject object) {
-        JsonArray array = new JsonArray();
-
-        for (int i = 0; i < c.getValue().length; i++) {
-            switch (c.getType()) {
-                case BOOLEAN:
-                    array.add((Boolean) c.getValue(i));
-                    break;
-                case DOUBLE:
-                case INTEGER:
-                    array.add((Number) c.getValue(i));
-                    break;
-                case STRING:
-                    array.add((String) c.getValue(i));
-                    break;
-                case ENUM:
-                    array.add(c.getValue(i).toString());
-                    break;
-                case GROUP:
-                    array.add(((ConfigItemGroup) c.getValue(i)).toJson());
-                default:
-                    break;
-            }
-        }
-
-        object.add(c.getName(), array);
-    }
-
-    /**
      * Converts the config items into json
-     *
-     * @return A {@link JsonObject} of this group
      */
-    public JsonObject toJson() {
+    public void toJson(JsonObject superObject) {
         JsonObject object = new JsonObject();
 
         for (ConfigItem<?> c : configs) {
-            if (!(c instanceof ArrayConfigItem))
-                parseConfig(c, object);
-            else
-                parseArrayConfig((ArrayConfigItem<?>) c, object);
+            c.toJson(object);
         }
 
-        return object;
+        superObject.add(this.getName(), object);
     }
 
     @Override
@@ -174,5 +109,20 @@ public class ConfigItemGroup extends ConfigItem<ConfigItemGroup> {
         }
         string += joiner.toString();
         return string + "]";
+    }
+
+    @Override
+    public <T> boolean isValidType(Class<T> clazz) {
+        return clazz == this.getClass();
+    }
+
+    @Override
+    public <S extends CommandSource> ArgumentBuilder<S, ?> getSetCommand(ConfigItemGroup group, Config config) {
+        return null;
+    }
+
+    @Override
+    public String getCommandValue() {
+        return null;
     }
 }

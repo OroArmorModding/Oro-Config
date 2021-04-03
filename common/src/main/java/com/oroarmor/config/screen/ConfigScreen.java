@@ -194,110 +194,111 @@ public abstract class ConfigScreen {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected void setupConfigItem(ConfigItem<?> ci, ConfigCategory category, ConfigEntryBuilder entryBuilder) {
-        if (!(ci instanceof ArrayConfigItem)) {
-            switch (ci.getType()) {
-                case BOOLEAN:
-                    setupBooleanConfigItem((ConfigItem<Boolean>) ci, category, entryBuilder);
-                    break;
-                case DOUBLE:
-                    setupDoubleConfigItem((ConfigItem<Double>) ci, category, entryBuilder);
-                    break;
-                case GROUP:
-                    List<AbstractConfigListEntry> entryList = ((ConfigItemGroup) ci).getConfigs().stream().map(configItem -> createConfigItem(configItem, entryBuilder, category.getCategoryKey().getString() + "." + ci.getName())).collect(Collectors.toList());
-                    SubCategoryBuilder groupCategory = entryBuilder.startSubCategory(new TranslatableText(category.getCategoryKey().getString() + "." + ci.getName()), entryList);
-                    category.addEntry(groupCategory.build());
-                    break;
-                case INTEGER:
-                    setupIntegerConfigItem((ConfigItem<Integer>) ci, category, entryBuilder);
-                    break;
-                case STRING:
-                    setupStringConfigItem((ConfigItem<String>) ci, category, entryBuilder);
-                    break;
-                case ENUM:
-                    setupEnumConfigItem((ConfigItem<Enum<?>>) ci, category, entryBuilder);
-                default:
-                    break;
-            }
-        } else {
-            switch (ci.getType()) {
-                case BOOLEAN:
-                    setupBooleanArrayConfigItem((ArrayConfigItem<Boolean>) ci, category, entryBuilder);
-                    break;
-                case DOUBLE:
-                    setupDoubleArrayConfigItem((ArrayConfigItem<Double>) ci, category, entryBuilder);
-                    break;
-                case GROUP:
-                    List<AbstractConfigListEntry> subList = new ArrayList<>();
-                    for (int i = 0; i < ((ArrayConfigItem<ConfigItemGroup>) ci).getValue().length; i++) {
-                        int finalI = i;
-                        List<AbstractConfigListEntry> entryList = (((ArrayConfigItem<ConfigItemGroup>) ci).getValue(i)).getConfigs().stream().map(configItem -> createConfigItem(configItem, entryBuilder, category.getCategoryKey().getString() + "." + ((ArrayConfigItem<ConfigItemGroup>) ci).getValue(finalI).getName())).collect(Collectors.toList());
-                        SubCategoryBuilder groupCategory = entryBuilder.startSubCategory(new TranslatableText(category.getCategoryKey().getString() + "." + ((ArrayConfigItem<ConfigItemGroup>) ci).getValue(finalI).getName()), entryList);
-                        subList.add(groupCategory.build());
-                    }
-
-                    category.addEntry(entryBuilder.startSubCategory(new TranslatableText(category.getCategoryKey().getString() + "." + (ci).getName()), subList).build());
-                    break;
-                case INTEGER:
-                    setupIntegerArrayConfigItem((ArrayConfigItem<Integer>) ci, category, entryBuilder);
-                    break;
-                case STRING:
-                    setupStringArrayConfigItem((ArrayConfigItem<String>) ci, category, entryBuilder);
-                    break;
-                case ENUM:
-                    setupEnumArrayConfigItem((ArrayConfigItem<Enum<?>>) ci, category, entryBuilder);
-                default:
-                    break;
-            }
-        }
+//        if (!(ci instanceof ArrayConfigItem)) {
+//            switch (ci.getType()) {
+//                case BOOLEAN:
+//                    setupBooleanConfigItem((ConfigItem<Boolean>) ci, category, entryBuilder);
+//                    break;
+//                case DOUBLE:
+//                    setupDoubleConfigItem((ConfigItem<Double>) ci, category, entryBuilder);
+//                    break;
+//                case GROUP:
+//                    List<AbstractConfigListEntry> entryList = ((ConfigItemGroup) ci).getConfigs().stream().map(configItem -> createConfigItem(configItem, entryBuilder, category.getCategoryKey().getString() + "." + ci.getName())).collect(Collectors.toList());
+//                    SubCategoryBuilder groupCategory = entryBuilder.startSubCategory(new TranslatableText(category.getCategoryKey().getString() + "." + ci.getName()), entryList);
+//                    category.addEntry(groupCategory.build());
+//                    break;
+//                case INTEGER:
+//                    setupIntegerConfigItem((ConfigItem<Integer>) ci, category, entryBuilder);
+//                    break;
+//                case STRING:
+//                    setupStringConfigItem((ConfigItem<String>) ci, category, entryBuilder);
+//                    break;
+//                case ENUM:
+//                    setupEnumConfigItem((ConfigItem<Enum<?>>) ci, category, entryBuilder);
+//                default:
+//                    break;
+//            }
+//        } else {
+//            switch (ci.getType()) {
+//                case BOOLEAN:
+//                    setupBooleanArrayConfigItem((ArrayConfigItem<Boolean>) ci, category, entryBuilder);
+//                    break;
+//                case DOUBLE:
+//                    setupDoubleArrayConfigItem((ArrayConfigItem<Double>) ci, category, entryBuilder);
+//                    break;
+//                case GROUP:
+//                    List<AbstractConfigListEntry> subList = new ArrayList<>();
+//                    for (int i = 0; i < ((ArrayConfigItem<ConfigItemGroup>) ci).getValue().length; i++) {
+//                        int finalI = i;
+//                        List<AbstractConfigListEntry> entryList = (((ArrayConfigItem<ConfigItemGroup>) ci).getValue(i)).getConfigs().stream().map(configItem -> createConfigItem(configItem, entryBuilder, category.getCategoryKey().getString() + "." + ((ArrayConfigItem<ConfigItemGroup>) ci).getValue(finalI).getName())).collect(Collectors.toList());
+//                        SubCategoryBuilder groupCategory = entryBuilder.startSubCategory(new TranslatableText(category.getCategoryKey().getString() + "." + ((ArrayConfigItem<ConfigItemGroup>) ci).getValue(finalI).getName()), entryList);
+//                        subList.add(groupCategory.build());
+//                    }
+//
+//                    category.addEntry(entryBuilder.startSubCategory(new TranslatableText(category.getCategoryKey().getString() + "." + (ci).getName()), subList).build());
+//                    break;
+//                case INTEGER:
+//                    setupIntegerArrayConfigItem((ArrayConfigItem<Integer>) ci, category, entryBuilder);
+//                    break;
+//                case STRING:
+//                    setupStringArrayConfigItem((ArrayConfigItem<String>) ci, category, entryBuilder);
+//                    break;
+//                case ENUM:
+//                    setupEnumArrayConfigItem((ArrayConfigItem<Enum<?>>) ci, category, entryBuilder);
+//                default:
+//                    break;
+//            }
+//        }
     }
 
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     private AbstractConfigListEntry<?> createConfigItem(ConfigItem<?> ci, ConfigEntryBuilder entryBuilder, String superGroupName) {
-        if (!(ci instanceof ArrayConfigItem)) {
-            switch (ci.getType()) {
-                case BOOLEAN:
-                    return createBooleanConfigItem((ConfigItem<Boolean>) ci, entryBuilder);
-                case DOUBLE:
-                    return createDoubleConfigItem((ConfigItem<Double>) ci, entryBuilder);
-                case INTEGER:
-                    return createIntegerConfigItem((ConfigItem<Integer>) ci, entryBuilder);
-                case STRING:
-                    return createStringConfigItem((ConfigItem<String>) ci, entryBuilder);
-                case ENUM:
-                    return createEnumConfigItem((ConfigItem<Enum<?>>) ci, entryBuilder);
-                case GROUP:
-                    List<AbstractConfigListEntry> subItems = ((ConfigItemGroup) ci).getConfigs().stream().map(configItem -> createConfigItem(configItem, entryBuilder, superGroupName + "." + ci.getName())).collect(Collectors.toList());
-                    SubCategoryBuilder groupCategory = entryBuilder.startSubCategory(new TranslatableText(superGroupName + "." + ci.getName()), subItems);
-                    return groupCategory.build();
-                default:
-                    return null;
-            }
-        } else {
-            switch (ci.getType()) {
-                case BOOLEAN:
-                    return createBooleanArrayConfigItem((ArrayConfigItem<Boolean>) ci, entryBuilder);
-                case DOUBLE:
-                    return createDoubleArrayConfigItem((ArrayConfigItem<Double>) ci, entryBuilder);
-                case INTEGER:
-                    return createIntegerArrayConfigItem((ArrayConfigItem<Integer>) ci, entryBuilder);
-                case STRING:
-                    return createStringArrayConfigItem((ArrayConfigItem<String>) ci, entryBuilder);
-                case ENUM:
-                    return createEnumArrayConfigItem((ArrayConfigItem<Enum<?>>) ci, entryBuilder);
-                case GROUP:
-                    List<AbstractConfigListEntry> subList = new ArrayList<>();
-                    for (int i = 0; i < ((ArrayConfigItem<ConfigItemGroup>) ci).getValue().length; i++) {
-                        int finalI = i;
-                        List<AbstractConfigListEntry> entryList = (((ArrayConfigItem<ConfigItemGroup>) ci).getValue(i)).getConfigs().stream().map(configItem -> createConfigItem(configItem, entryBuilder, superGroupName + "." + ((ArrayConfigItem<ConfigItemGroup>) ci).getValue(finalI).getName())).collect(Collectors.toList());
-                        SubCategoryBuilder groupCategory = entryBuilder.startSubCategory(new TranslatableText(superGroupName + "." + ((ArrayConfigItem<ConfigItemGroup>) ci).getValue(finalI).getName()), entryList);
-                        subList.add(groupCategory.build());
-                    }
-
-                    return entryBuilder.startSubCategory(new TranslatableText(superGroupName + "." + (ci).getName()), subList).build();
-                default:
-                    return null;
-            }
-        }
+//        if (!(ci instanceof ArrayConfigItem)) {
+//            switch (ci.getType()) {
+//                case BOOLEAN:
+//                    return createBooleanConfigItem((ConfigItem<Boolean>) ci, entryBuilder);
+//                case DOUBLE:
+//                    return createDoubleConfigItem((ConfigItem<Double>) ci, entryBuilder);
+//                case INTEGER:
+//                    return createIntegerConfigItem((ConfigItem<Integer>) ci, entryBuilder);
+//                case STRING:
+//                    return createStringConfigItem((ConfigItem<String>) ci, entryBuilder);
+//                case ENUM:
+//                    return createEnumConfigItem((ConfigItem<Enum<?>>) ci, entryBuilder);
+//                case GROUP:
+//                    List<AbstractConfigListEntry> subItems = ((ConfigItemGroup) ci).getConfigs().stream().map(configItem -> createConfigItem(configItem, entryBuilder, superGroupName + "." + ci.getName())).collect(Collectors.toList());
+//                    SubCategoryBuilder groupCategory = entryBuilder.startSubCategory(new TranslatableText(superGroupName + "." + ci.getName()), subItems);
+//                    return groupCategory.build();
+//                default:
+//                    return null;
+//            }
+//        } else {
+//            switch (ci.getType()) {
+//                case BOOLEAN:
+//                    return createBooleanArrayConfigItem((ArrayConfigItem<Boolean>) ci, entryBuilder);
+//                case DOUBLE:
+//                    return createDoubleArrayConfigItem((ArrayConfigItem<Double>) ci, entryBuilder);
+//                case INTEGER:
+//                    return createIntegerArrayConfigItem((ArrayConfigItem<Integer>) ci, entryBuilder);
+//                case STRING:
+//                    return createStringArrayConfigItem((ArrayConfigItem<String>) ci, entryBuilder);
+//                case ENUM:
+//                    return createEnumArrayConfigItem((ArrayConfigItem<Enum<?>>) ci, entryBuilder);
+//                case GROUP:
+//                    List<AbstractConfigListEntry> subList = new ArrayList<>();
+//                    for (int i = 0; i < ((ArrayConfigItem<ConfigItemGroup>) ci).getValue().length; i++) {
+//                        int finalI = i;
+//                        List<AbstractConfigListEntry> entryList = (((ArrayConfigItem<ConfigItemGroup>) ci).getValue(i)).getConfigs().stream().map(configItem -> createConfigItem(configItem, entryBuilder, superGroupName + "." + ((ArrayConfigItem<ConfigItemGroup>) ci).getValue(finalI).getName())).collect(Collectors.toList());
+//                        SubCategoryBuilder groupCategory = entryBuilder.startSubCategory(new TranslatableText(superGroupName + "." + ((ArrayConfigItem<ConfigItemGroup>) ci).getValue(finalI).getName()), entryList);
+//                        subList.add(groupCategory.build());
+//                    }
+//
+//                    return entryBuilder.startSubCategory(new TranslatableText(superGroupName + "." + (ci).getName()), subList).build();
+//                default:
+//                    return null;
+//            }
+//        }
+        return null;
     }
 }
