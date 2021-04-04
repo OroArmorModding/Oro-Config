@@ -25,6 +25,7 @@
 package com.oroarmor.config.testmod;
 
 import com.oroarmor.config.Config;
+import com.oroarmor.config.command.ClientConfigCommand;
 import com.oroarmor.config.command.ConfigCommand;
 
 import net.minecraft.client.network.ClientCommandSource;
@@ -45,6 +46,6 @@ public class OroConfigTestModClient implements ClientModInitializer {
         CONFIG.readConfigFromFile();
         CONFIG.saveConfigToFile();
         ClientLifecycleEvents.CLIENT_STOPPING.register(instance -> CONFIG.saveConfigToFile());
-        new ConfigCommand<FabricClientCommandSource>(CONFIG).register(ClientCommandManager.DISPATCHER, p -> true);
+        new ClientConfigCommand<FabricClientCommandSource>(CONFIG).register(ClientCommandManager.DISPATCHER, p -> true);
     }
 }

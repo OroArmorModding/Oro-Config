@@ -101,7 +101,7 @@ public class ConfigCommand<S extends CommandSource> {
         return 1;
     }
 
-    private int listConfigGroups(CommandContext<S> c) {
+    protected int listConfigGroups(CommandContext<S> c) {
         MutableText configList = new LiteralText("");
 
         for (ConfigItemGroup group : config.getConfigs()) {

@@ -34,6 +34,8 @@ dependencies {
         transitive = false
     }
 
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${rootProject.fabric_api_version}"
+
     modApi("com.terraformersmc:modmenu:1.16.8") {
         exclude(module: "fabric-api")
     }

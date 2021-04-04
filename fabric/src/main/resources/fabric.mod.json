@@ -12,6 +12,11 @@
   "license": "MIT",
   "icon": "oro-config_icon.jpg",
   "environment": "*",
+  "entrypoints": {
+    "client": [
+      "com.oroarmor.config.command.ClientCommandHelper::registerOpenScreen"
+    ]
+  },
   "depends": {
     "fabricloader": ">=0.7.4"
   },
