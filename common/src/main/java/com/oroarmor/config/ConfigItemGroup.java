@@ -31,9 +31,6 @@ import java.util.StringJoiner;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mojang.brigadier.builder.ArgumentBuilder;
-
-import net.minecraft.command.CommandSource;
 
 /**
  * Extending {@link ConfigItem}, {@link ConfigItemGroup} can store multiple
@@ -114,11 +111,6 @@ public class ConfigItemGroup extends ConfigItem<ConfigItem<?>> {
     @Override
     public <T> boolean isValidType(Class<T> clazz) {
         return clazz == this.getClass();
-    }
-
-    @Override
-    public <S extends CommandSource> ArgumentBuilder<S, ?> getSetCommand(ConfigItemGroup group, Config config) {
-        return null;
     }
 
     @Override

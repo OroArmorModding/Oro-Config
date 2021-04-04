@@ -29,13 +29,7 @@ import java.util.function.Consumer;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mojang.brigadier.builder.ArgumentBuilder;
-import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import org.jetbrains.annotations.Nullable;
-
-import net.minecraft.command.CommandSource;
-
-import static com.mojang.brigadier.builder.LiteralArgumentBuilder.literal;
 
 public class EnumConfigItem<T extends Enum<T>> extends ConfigItem<T> {
     public EnumConfigItem(String name, T defaultValue, String details) {
@@ -60,21 +54,6 @@ public class EnumConfigItem<T extends Enum<T>> extends ConfigItem<T> {
     @Override
     public <T1> boolean isValidType(Class<T1> clazz) {
         return clazz == defaultValue.getClass();
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <S extends CommandSource> ArgumentBuilder<?, ?> getSetCommand(ConfigItemGroup group, Config config) {
-        LiteralArgumentBuilder<S> builder = literal("set");
-        Enum<?>[] enums = ((Enum<?>) this.getValue()).getClass().getEnumConstants();
-        for (Enum<?> _enum : enums) {
-            builder.then(LiteralArgumentBuilder.<S>literal(_enum.toString()).executes(c -> {
-                this.setValue((T) _enum);
-                config.saveConfigToFile();
-                return 1;
-            }));
-        }
-        return builder;
     }
 
     @Override

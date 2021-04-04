@@ -28,13 +28,7 @@ import java.util.function.Consumer;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.builder.ArgumentBuilder;
 import org.jetbrains.annotations.Nullable;
-
-import net.minecraft.command.CommandSource;
-
-import static com.mojang.brigadier.builder.RequiredArgumentBuilder.argument;
 
 public class StringConfigItem extends ConfigItem<String> {
     public StringConfigItem(String name, String defaultValue, String details) {
@@ -58,16 +52,6 @@ public class StringConfigItem extends ConfigItem<String> {
     @Override
     public <T> boolean isValidType(Class<T> clazz) {
         return clazz == String.class;
-    }
-
-    @Override
-    public <S extends CommandSource> ArgumentBuilder<?, ?> getSetCommand(ConfigItemGroup group, Config config) {
-        return argument("string", StringArgumentType.string()).executes(c -> {
-            String result = StringArgumentType.getString(c, "string");
-            this.setValue(result);
-            config.saveConfigToFile();
-            return 1;
-        });
     }
 
     @Override

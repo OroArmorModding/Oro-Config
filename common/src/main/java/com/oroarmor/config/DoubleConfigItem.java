@@ -28,14 +28,7 @@ import java.util.function.Consumer;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mojang.brigadier.arguments.DoubleArgumentType;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.builder.ArgumentBuilder;
 import org.jetbrains.annotations.Nullable;
-
-import net.minecraft.command.CommandSource;
-
-import static com.mojang.brigadier.builder.RequiredArgumentBuilder.argument;
 
 public class DoubleConfigItem extends ConfigItem<Double> {
     protected double min = Double.MIN_VALUE;
@@ -76,16 +69,6 @@ public class DoubleConfigItem extends ConfigItem<Double> {
     }
 
     @Override
-    public <S extends CommandSource> ArgumentBuilder<?, ?> getSetCommand(ConfigItemGroup group, Config config) {
-        return argument("double", DoubleArgumentType.doubleArg(min, max)).executes(c -> {
-            double result = DoubleArgumentType.getDouble(c, "double");
-            this.setValue(result);
-            config.saveConfigToFile();
-            return 1;
-        });
-    }
-
-    @Override
     public void setValue(Double value) {
         super.setValue(Double.max(Double.min(value, max), min));
     }
@@ -93,5 +76,13 @@ public class DoubleConfigItem extends ConfigItem<Double> {
     @Override
     public String getCommandValue() {
         return this.value.toString();
+    }
+
+    public double getMin() {
+        return min;
+    }
+
+    public double getMax() {
+        return max;
     }
 }

@@ -22,40 +22,30 @@
  * SOFTWARE.
  */
 
-package com.oroarmor.config;
+package com.oroarmor.config.testmod;
 
-import java.util.function.Consumer;
+import java.io.File;
+import java.util.List;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import org.jetbrains.annotations.Nullable;
+import com.oroarmor.config.*;
 
-public class BooleanConfigItem extends ConfigItem<Boolean> {
-    public BooleanConfigItem(String name, Boolean defaultValue, String details) {
-        super(name, defaultValue, details);
+import net.fabricmc.loader.api.FabricLoader;
+import static com.google.common.collect.ImmutableList.of;
+
+public class TestConfigClient extends Config {
+    public static final ConfigItemGroup mainGroup = new ConfigGroupLevel1();
+
+    public static final List<ConfigItemGroup> configs = of(mainGroup);
+
+    public TestConfigClient() {
+        super(configs, new File(FabricLoader.getInstance().getConfigDir().toFile(), "oroarmor_config_testmod_client.json"), "oroarmor_config_testmod_client");
     }
 
-    public BooleanConfigItem(String name, Boolean defaultValue, String details, @Nullable Consumer<ConfigItem<Boolean>> onChange) {
-        super(name, defaultValue, details, onChange);
-    }
+    public static class ConfigGroupLevel1 extends ConfigItemGroup {
+        public static final DoubleConfigItem testDouble = new DoubleConfigItem("test_double", 0d, "test_double", null, -1, 1);
 
-    @Override
-    public void fromJson(JsonElement element) {
-        this.value = element.getAsBoolean();
-    }
-
-    @Override
-    public void toJson(JsonObject object) {
-        object.addProperty(this.name, this.value);
-    }
-
-    @Override
-    public <T> boolean isValidType(Class<T> clazz) {
-        return clazz == Boolean.class;
-    }
-
-    @Override
-    public String getCommandValue() {
-        return this.value.toString();
+        public ConfigGroupLevel1() {
+            super(of(testDouble), "group");
+        }
     }
 }

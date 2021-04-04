@@ -45,6 +45,7 @@ import net.minecraft.text.HoverEvent;
 import net.minecraft.text.HoverEvent.Action;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Util;
 
@@ -92,11 +93,7 @@ public class ConfigCommand<S extends CommandSource> {
         configList.append("/");
 
         try {
-            if (c.getSource() instanceof ServerCommandSource) {
-                ((ServerCommandSource) c.getSource()).getPlayer().sendSystemMessage(configList, Util.NIL_UUID);
-            } else if (c.getSource() instanceof ClientCommandSource) {
-                MinecraftClient.getInstance().inGameHud.addChatMessage(MessageType.GAME_INFO, configList, Util.NIL_UUID);
-            }
+            sendFeedback(c, configList);
         } catch (CommandSyntaxException e) {
             e.printStackTrace();
         }
@@ -116,11 +113,7 @@ public class ConfigCommand<S extends CommandSource> {
         }
 
         try {
-            if (c.getSource() instanceof ServerCommandSource) {
-                ((ServerCommandSource) c.getSource()).getPlayer().sendSystemMessage(configList, Util.NIL_UUID);
-            } else if (c.getSource() instanceof ClientCommandSource) {
-                MinecraftClient.getInstance().inGameHud.addChatMessage(MessageType.GAME_INFO, configList, Util.NIL_UUID);
-            }
+            sendFeedback(c, configList);
         } catch (CommandSyntaxException e) {
             e.printStackTrace();
         }
@@ -145,16 +138,21 @@ public class ConfigCommand<S extends CommandSource> {
 
     protected int listItem(CommandContext<S> c, ConfigItem<?> item) {
         try {
-            if (c.getSource() instanceof ServerCommandSource) {
-                ((ServerCommandSource) c.getSource()).getPlayer().sendSystemMessage(createItemText(item), Util.NIL_UUID);
-            } else if (c.getSource() instanceof ClientCommandSource) {
-                MinecraftClient.getInstance().inGameHud.addChatMessage(MessageType.GAME_INFO, createItemText(item), Util.NIL_UUID);
-            }
+            Text text = createItemText(item);
+            sendFeedback(c, text);
         } catch (CommandSyntaxException e) {
             e.printStackTrace();
         }
 
         return 1;
+    }
+
+    private void sendFeedback(CommandContext<S> c, Text text) throws CommandSyntaxException {
+        if (c.getSource() instanceof ServerCommandSource) {
+            ((ServerCommandSource) c.getSource()).getPlayer().sendSystemMessage(text, Util.NIL_UUID);
+        } else if (c.getSource().getClass().getSimpleName().toLowerCase().contains("client")) {
+            MinecraftClient.getInstance().inGameHud.addChatMessage(MessageType.CHAT, text, Util.NIL_UUID);
+        }
     }
 
     public void register(CommandDispatcher<S> dispatcher, Predicate<S> usable) {
@@ -167,7 +165,6 @@ public class ConfigCommand<S extends CommandSource> {
         dispatcher.register(literalArgumentBuilder);
     }
 
-    @SuppressWarnings("unchecked")
     protected void parseConfigItemGroupCommand(LiteralArgumentBuilder<S> literalArgumentBuilder, ConfigItemGroup group) {
         LiteralArgumentBuilder<S> configGroupCommand = LiteralArgumentBuilder.<S>literal(group.getName()).executes((c) -> listConfigGroup(c, group));
         for (ConfigItem<?> item : group.getConfigs()) {
@@ -175,10 +172,14 @@ public class ConfigCommand<S extends CommandSource> {
                 parseConfigItemGroupCommand(configGroupCommand, (ConfigItemGroup) item);
             } else {
                 LiteralArgumentBuilder<S> configItemCommand = LiteralArgumentBuilder.<S>literal(item.getName()).executes((c) -> listItem(c, item));
-                configItemCommand.then((ArgumentBuilder<S, ?>) item.getSetCommand(group, config));
+                configItemCommand.then(getCommand(item, group, config));
                 configGroupCommand.then(configItemCommand);
             }
         }
         literalArgumentBuilder.then(configGroupCommand);
+    }
+
+    private <T> ArgumentBuilder<S, ?> getCommand(ConfigItem<T> configItem, ConfigItemGroup group, Config config) {
+        return ConfigItemCommands.getCommandBuilder(configItem).getCommand(configItem, group, config);
     }
 }

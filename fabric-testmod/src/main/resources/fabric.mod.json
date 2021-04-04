@@ -16,6 +16,9 @@
     ],
     "modmenu": [
       "com.oroarmor.config.testmod.ModMenuIntegration"
+    ],
+    "client": [
+      "com.oroarmor.config.testmod.OroConfigTestModClient"
     ]
   },
   "depends": {

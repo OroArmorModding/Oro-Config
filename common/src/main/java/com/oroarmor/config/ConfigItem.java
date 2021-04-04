@@ -28,10 +28,7 @@ import java.util.function.Consumer;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mojang.brigadier.builder.ArgumentBuilder;
 import org.jetbrains.annotations.Nullable;
-
-import net.minecraft.command.CommandSource;
 
 /**
  * {@link ConfigItem} often stores a name and a value for saving data into a
@@ -138,8 +135,6 @@ public abstract class ConfigItem<T> {
 
     public abstract <T1> boolean isValidType(Class<T1> clazz);
 
-    public abstract <S extends CommandSource> ArgumentBuilder<?, ?> getSetCommand(ConfigItemGroup group, Config config);
-
     public abstract String getCommandValue();
 
     public boolean atDefaultValue() {
@@ -149,47 +144,4 @@ public abstract class ConfigItem<T> {
     public String getCommandDefaultValue() {
         return this.value.toString();
     }
-
-//    /**
-//     * The current types for the config items
-//     *
-//     * @author Eli Orona
-//     */
-//    public enum Type {
-//        BOOLEAN, INTEGER, DOUBLE, STRING, GROUP, ENUM;
-//
-//        /**
-//         * Gets the corresponding type for an object. If the object's type is not
-//         * supported, this returns null.
-//         *
-//         * @param value The object to find the type for
-//         * @return The type for that object
-//         */
-//        public static Type getTypeFrom(Object value) {
-//            if (value instanceof Boolean) {
-//                return BOOLEAN;
-//            }
-//            if (value instanceof Integer) {
-//                return INTEGER;
-//            }
-//            if (value instanceof Double) {
-//                return DOUBLE;
-//            }
-//            if (value instanceof String) {
-//                return STRING;
-//            }
-//            if (value instanceof ConfigItemGroup) {
-//                return GROUP;
-//            }
-//            if (value instanceof Enum) {
-//                return ENUM;
-//            }
-//
-//            if (value != null && value.getClass().isArray()) {
-//                return getTypeFrom(((Object[]) value)[0]);
-//            }
-//
-//            return null;
-//        }
-//    }
 }

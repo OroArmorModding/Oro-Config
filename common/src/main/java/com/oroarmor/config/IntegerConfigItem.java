@@ -28,13 +28,7 @@ import java.util.function.Consumer;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
-import com.mojang.brigadier.builder.ArgumentBuilder;
 import org.jetbrains.annotations.Nullable;
-
-import net.minecraft.command.CommandSource;
-
-import static com.mojang.brigadier.builder.RequiredArgumentBuilder.argument;
 
 public class IntegerConfigItem extends ConfigItem<Integer> {
     protected int min = Integer.MIN_VALUE;
@@ -75,16 +69,6 @@ public class IntegerConfigItem extends ConfigItem<Integer> {
     }
 
     @Override
-    public <S extends CommandSource> ArgumentBuilder<?, ?> getSetCommand(ConfigItemGroup group, Config config) {
-        return argument("int", IntegerArgumentType.integer(min, max)).executes(c -> {
-            int result = IntegerArgumentType.getInteger(c, "int");
-            this.setValue(result);
-            config.saveConfigToFile();
-            return 1;
-        });
-    }
-
-    @Override
     public void setValue(Integer value) {
         super.setValue(Integer.max(Integer.min(value, max), min));
     }
@@ -92,5 +76,13 @@ public class IntegerConfigItem extends ConfigItem<Integer> {
     @Override
     public String getCommandValue() {
         return this.value.toString();
+    }
+
+    public int getMin() {
+        return min;
+    }
+
+    public int getMax() {
+        return max;
     }
 }
