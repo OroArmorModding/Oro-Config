@@ -30,6 +30,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * A Config item for integers
+ */
 public class IntegerConfigItem extends ConfigItem<Integer> {
     protected int min = Integer.MIN_VALUE;
     protected int max = Integer.MAX_VALUE;
@@ -78,10 +81,20 @@ public class IntegerConfigItem extends ConfigItem<Integer> {
         return this.value.toString();
     }
 
+    /**
+     * The min value for the config
+     *
+     * @return min
+     */
     public int getMin() {
         return min;
     }
 
+    /**
+     * The max value for the config
+     *
+     * @return max
+     */
     public int getMax() {
         return max;
     }

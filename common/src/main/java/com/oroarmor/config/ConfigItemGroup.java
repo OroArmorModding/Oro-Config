@@ -86,6 +86,7 @@ public class ConfigItemGroup extends ConfigItem<ConfigItem<?>> {
     /**
      * Converts the config items into json
      */
+    @Override
     public void toJson(JsonObject superObject) {
         JsonObject object = new JsonObject();
 

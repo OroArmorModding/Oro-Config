@@ -40,30 +40,11 @@ import net.minecraft.command.CommandSource;
 
 import static com.mojang.brigadier.builder.LiteralArgumentBuilder.literal;
 
+/**
+ * Storage and registration for the commands to set config items
+ */
 public final class ConfigItemCommands {
     private static final Map<Class<? extends ConfigItem<?>>, CommandBuilder<?>> COMMANDS = new HashMap<>();
-
-    public static <T extends ConfigItem<?>> void register(Class<T> configItemClass, CommandBuilder<?> builder) {
-        if (COMMANDS.containsKey(configItemClass)) {
-            throw new IllegalArgumentException("Duplicate entries for " + configItemClass.getSimpleName());
-        }
-
-        COMMANDS.put(configItemClass, builder);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T, C extends ConfigItem<T>> CommandBuilder<T> getCommandBuilder(C configItem) {
-        return (CommandBuilder<T>) COMMANDS.getOrDefault(configItem.getClass(), new CommandBuilder<T>() {
-            @Override
-            public <S extends CommandSource> ArgumentBuilder<S, ?> getCommand(ConfigItem<T> configItem, ConfigItemGroup group, Config config) {
-                throw new IllegalArgumentException("Unknown Config Type");
-            }
-        });
-    }
-
-    public interface CommandBuilder<T> {
-        <S extends CommandSource> ArgumentBuilder<S, ?> getCommand(ConfigItem<T> configItem, ConfigItemGroup group, Config config);
-    }
 
     static {
         register(BooleanConfigItem.class, new CommandBuilder<Boolean>() {
@@ -114,6 +95,57 @@ public final class ConfigItemCommands {
             }
         });
         register(ArrayConfigItem.class, new ArrayCommandBuilder<>());
+    }
+
+    /**
+     * Registers a new command builder for the config item
+     *
+     * @param configItemClass The class for the config item
+     * @param builder         The builder to use
+     * @param <T>             A config item type
+     */
+    public static <T extends ConfigItem<?>> void register(Class<T> configItemClass, CommandBuilder<?> builder) {
+        if (COMMANDS.containsKey(configItemClass)) {
+            throw new IllegalArgumentException("Duplicate entries for " + configItemClass.getSimpleName());
+        }
+
+        COMMANDS.put(configItemClass, builder);
+    }
+
+    /**
+     * Gets the config builder for the config item
+     *
+     * @param configItem The config item to get the builder for
+     * @param <T>        The type of the config item's value
+     * @param <C>        The type for the config item
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public static <T, C extends ConfigItem<T>> CommandBuilder<T> getCommandBuilder(C configItem) {
+        return (CommandBuilder<T>) COMMANDS.getOrDefault(configItem.getClass(), new CommandBuilder<T>() {
+            @Override
+            public <S extends CommandSource> ArgumentBuilder<S, ?> getCommand(ConfigItem<T> configItem, ConfigItemGroup group, Config config) {
+                throw new IllegalArgumentException("Unknown Config Type");
+            }
+        });
+    }
+
+    /**
+     * An interface to build new commands
+     *
+     * @param <T> The type for the config item the command builder is for
+     */
+    public interface CommandBuilder<T> {
+        /**
+         * Gets the command for the config item
+         *
+         * @param configItem The config item
+         * @param group      The group for the item
+         * @param config     The config for the item
+         * @param <S>        The command source type
+         * @return A command for the config item
+         */
+        <S extends CommandSource> ArgumentBuilder<S, ?> getCommand(ConfigItem<T> configItem, ConfigItemGroup group, Config config);
     }
 
     private static class ArrayCommandBuilder<T> implements CommandBuilder<T[]> {

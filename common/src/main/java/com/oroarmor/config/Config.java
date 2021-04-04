@@ -107,6 +107,14 @@ public class Config {
 
     }
 
+    /**
+     * Gets a the value at path
+     *
+     * @param path  The path to search
+     * @param clazz The class of the type to get
+     * @param <T>   The type to get
+     * @return The value if it exists
+     */
     @SuppressWarnings("unchecked")
     public <T> T getValue(String path, Class<T> clazz) {
         String[] splitPath = path.split("\\.");
@@ -136,7 +144,7 @@ public class Config {
     public void saveConfigToFile() {
         JsonObject object = new JsonObject();
         for (ConfigItemGroup c : configs) {
-           c.toJson(object);
+            c.toJson(object);
         }
 
         try (FileOutputStream stream = new FileOutputStream(configFile)) {

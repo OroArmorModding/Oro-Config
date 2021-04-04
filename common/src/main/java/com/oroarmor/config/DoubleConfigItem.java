@@ -30,6 +30,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * A Config item for doubles
+ */
 public class DoubleConfigItem extends ConfigItem<Double> {
     protected double min = Double.MIN_VALUE;
     protected double max = Double.MAX_VALUE;
@@ -78,10 +81,20 @@ public class DoubleConfigItem extends ConfigItem<Double> {
         return this.value.toString();
     }
 
+    /**
+     * The max value for the config
+     *
+     * @return max
+     */
     public double getMin() {
         return min;
     }
 
+    /**
+     * The min value for the config
+     *
+     * @return min
+     */
     public double getMax() {
         return max;
     }

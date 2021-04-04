@@ -27,7 +27,9 @@ package com.oroarmor.config.testmod;
 import java.io.File;
 import java.util.List;
 
-import com.oroarmor.config.*;
+import com.oroarmor.config.Config;
+import com.oroarmor.config.ConfigItemGroup;
+import com.oroarmor.config.DoubleConfigItem;
 
 import net.fabricmc.loader.api.FabricLoader;
 import static com.google.common.collect.ImmutableList.of;

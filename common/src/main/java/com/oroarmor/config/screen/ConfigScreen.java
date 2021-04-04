@@ -84,6 +84,12 @@ public abstract class ConfigScreen {
         return ConfigScreenBuilders.getEntryBuilder(ci).getConfigEntry((ConfigItem) ci, entryBuilder, config);
     }
 
+    /**
+     * Creates a config screen
+     *
+     * @param parent The parent screen
+     * @return A new screen
+     */
     @SuppressWarnings("rawtypes")
     public Screen createScreen(Screen parent) {
         ConfigBuilder builder = ConfigBuilder.create().setParentScreen(parent).setTitle(new TranslatableText("config." + config.getID()));

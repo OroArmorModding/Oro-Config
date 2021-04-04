@@ -30,6 +30,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * A Config item for strings
+ */
 public class StringConfigItem extends ConfigItem<String> {
     public StringConfigItem(String name, String defaultValue, String details) {
         super(name, defaultValue, details);

@@ -36,7 +36,12 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.command.CommandSource;
 
-public class ClientConfigCommand<S extends CommandSource> extends ConfigCommand<S>{
+/**
+ * A way to add client only commands for your config
+ *
+ * @param <S> A client command source
+ */
+public class ClientConfigCommand<S extends CommandSource> extends ConfigCommand<S> {
     public static Screen openScreen;
 
     /**
@@ -58,7 +63,8 @@ public class ClientConfigCommand<S extends CommandSource> extends ConfigCommand<
         }
 
         literalArgumentBuilder.then(LiteralArgumentBuilder.<S>literal("gui").executes(context -> {
-            openScreen = new ConfigScreen(config){}.createScreen(MinecraftClient.getInstance().currentScreen);
+            openScreen = new ConfigScreen(config) {
+            }.createScreen(MinecraftClient.getInstance().currentScreen);
             return 1;
         }));
 

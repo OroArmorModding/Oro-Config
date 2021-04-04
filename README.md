@@ -35,7 +35,7 @@ Then in your dependencies section add my library to the classpath and shadow it 
 
 ```
 dependencies {	
-  modImplementation 'com.oroarmor:oro-config-forge:${version}'
+  implementation fg.deobf('com.oroarmor:oro-config-forge:${version}')
   shadow 'com.oroarmor:oro-config-forge:${version}'
 }
 ```
@@ -46,7 +46,7 @@ Then in your dependencies section add my library to the classpath and shadow it 
 
 ```
 dependencies {	
-  modImplementation 'com.oroarmor:oro-config-common:${version}'
+  implemenation 'com.oroarmor:oro-config-common:${version}'
   shadow 'com.oroarmor:oro-config-common:${version}'
 }
 ```
@@ -55,7 +55,7 @@ dependencies {
 The best way to use my config is to extend `com.oroarmor.config.Config` with your own class. Inside this class, you should include other classes that extend `com.oroarmor.config.ConfigItemGroup` for your config groups. See the [example](#example) for a way to use the library.
 
 ### Config Item
-`ConfigItem`s are the main storage of the different values that make up your config. Currently the only supported types are `String`, `Double`, `Integer`, `Boolean`, and all enums (Technically `ConfigItemGroup`s, but those are extremely different). There are two constructors for `ConfigItem`:
+`ConfigItem`s are the main storage of the different values that make up your config. There are two constructors for `ConfigItem`s:
 ```java
 ConfigItem(String name, T defaultValue, String details)
 ```
@@ -63,7 +63,7 @@ and
 ```java
 ConfigItem(String name, T defaultValue, String details, Consumer<ConfigItem<T>> onChange)
 ```
-T is the type of data that you are storing in this `ConfigItem`, being on of the supported types.
+T is the type of data that you are storing in this `ConfigItem`, being one of the supported types.
 
 The name is for the name of this `ConfigItem`, which is used in the json to identify what the values are used for.
 The default value is the value that is normal for the config to use, but is overriden when the config file is read.
@@ -73,9 +73,11 @@ The second constructor has an `onChange` parameter, which is a Consumer that is 
 
 You can get the value from a `ConfigItem` with the `getValue` method.
 
+The library provides `ConfigItem`s for the types `String`, `Double`, `Integer`, `Boolean`, and any `Enum`. `ConfigItem` can be extended for custom value types. Registering an `EntryBuilder` and a `CommandBuilder` in `ConfigScreenBuilders` and `ConfigItemCommands` respectively add them to the config screen and command.
+
 #### Array Config Items
 
-`ArrayConfigItem`s are exactly the same as normal config items, but have a couple useful methods to get values based on their index. You cannot nest `ArrayConfigItem`s inside other `ArrayConfigItem`s
+`ArrayConfigItem`s are exactly the same as normal config items, but have a couple useful methods to get values based on their index. You cannot nest `ArrayConfigItem`s inside other `ArrayConfigItem`s. The only supported types are `String`, `Double`, `Integer`, `Boolean`, and any `Enum`
 
 ### Config Item Groups
 `ConfigItemGroup`s are a way to store multiple `ConfigItem`s into one group. `ConfigItemGroup`s can be nested in each other for sub groups. There is one constructor:
@@ -95,7 +97,7 @@ File is for the file to save the config into.
 Id is for the ID of the config which is used in commands and modmenu.
 
 ### Command
-`ConfigCommand` is a simple class that ust requires a `Config` in its constructor. It does not handle its own registering, and must be registered through Fabric API
+`ConfigCommand` is a simple class that just requires a `Config` in its constructor. It does not handle its own registering, and must be registered through Fabric API
 
 The command is currently broken for forge
 
@@ -106,7 +108,7 @@ The command is currently broken for forge
 Currently broken
 
 ### Example:
-These are pulled from the testmod, and are part of this repositiory. [Test Mod](https://github.com/OroArmor/oro-config/tree/master/fabric-testmod/src/main)
+These are pulled from the testmod, and are part of this repository. [Test Mod](https://github.com/OroArmor/oro-config/tree/master/fabric-testmod/src/main)
 
 Config Class:
 ```java
@@ -120,8 +122,8 @@ public class TestConfig extends Config {
     }
 
     public static class ConfigGroupLevel1 extends ConfigItemGroup {
-        public static final ConfigItem<EnumTest> testEnum = new ConfigItem<>("test_enum", EnumTest.A, "test_enum");
-        public static final ConfigItem<Boolean> testItem = new ConfigItem<>("test_boolean", true, "test_boolean");
+        public static final EnumConfigItem<EnumTest> testEnum = new EnumConfigItem<>("test_enum", EnumTest.A, "test_enum");
+        public static final BooleanConfigItem testItem = new BooleanConfigItem("test_boolean", true, "test_boolean");
 
         public static final ArrayConfigItem<Integer> testArray = new ArrayConfigItem<>("test_array", new Integer[]{1, 2, 3}, "test_array");
 
@@ -130,14 +132,14 @@ public class TestConfig extends Config {
         }
 
         public static class NestedGroup extends ConfigItemGroup {
-            public static final ConfigItem<Integer> nestedItem = new ConfigItem<>("test_int", 0, "test_integer");
+            public static final IntegerConfigItem nestedItem = new IntegerConfigItem("test_int", 0, "test_integer");
 
             public NestedGroup() {
                 super(of(nestedItem, new TripleNested()), "nested");
             }
 
             public static class TripleNested extends ConfigItemGroup {
-                public static final ConfigItem<String> testString = new ConfigItem<>("test_string", "Default", "test_string");
+                public static final StringConfigItem testString = new StringConfigItem("test_string", "Default", "test_string");
 
                 public TripleNested() {
                     super(of(testString), "triple");
@@ -170,7 +172,7 @@ This then creates a config file called `oroarmor_config_testmod.json` in the `/c
 
 Fabric Command Registration:
 ```java
-CommandRegistrationCallback.EVENT.register(new ConfigCommand(YOUR_CONFIG)::register);
+CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> new ConfigCommand(YOUR_CONFIG).register(dispatcher, p -> p.hasPermissionLevel(2)));
 ```
 
 Mod Menu Integration:

@@ -1,7 +1,7 @@
 plugins {
     id "java"
-    id "architectury-plugin" version "3.0.93"
-    id "forgified-fabric-loom" version "0.6.72" apply false
+    id "architectury-plugin" version "3.0.99"
+    id "forgified-fabric-loom" version "0.6.79" apply false
     id 'org.cadixdev.licenser' version '0.5.0' apply false
 }
 
@@ -45,7 +45,7 @@ subprojects {
         onlyIf { project.hasProperty("sign") }
     }
 
-    if(project.hasProperty("sign")) {
+    if (project.hasProperty("sign")) {
         signing {
             useGpgCmd()
             sign configurations.archives

@@ -36,27 +36,11 @@ import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.text.TranslatableText;
 
+/**
+ * Storage and registration for the config entries to set config items
+ */
 public class ConfigScreenBuilders {
     private static final Map<Class<? extends ConfigItem<?>>, EntryBuilder<?>> COMMANDS = new HashMap<>();
-
-    public static <T extends ConfigItem<?>> void register(Class<T> configItemClass, EntryBuilder<?> builder) {
-        if (COMMANDS.containsKey(configItemClass)) {
-            throw new IllegalArgumentException("Duplicate entries for " + configItemClass.getSimpleName());
-        }
-
-        COMMANDS.put(configItemClass, builder);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T, C extends ConfigItem<T>> EntryBuilder<T> getEntryBuilder(C configItem) {
-        return (EntryBuilder<T>) COMMANDS.getOrDefault(configItem.getClass(), (EntryBuilder<T>) (configItem1, entryBuilder, config) -> {
-            throw new IllegalArgumentException("Unknown Config Type");
-        });
-    }
-
-    public interface EntryBuilder<T> {
-        AbstractConfigListEntry<?> getConfigEntry(ConfigItem<T> configItem, ConfigEntryBuilder entryBuilder, Config config);
-    }
 
     static {
         register(BooleanConfigItem.class, (EntryBuilder<Boolean>) (configItem, entryBuilder, config) -> entryBuilder.startBooleanToggle(new TranslatableText(configItem.getDetails()), configItem.getValue()).setSaveConsumer(configItem::setValue).setDefaultValue(configItem::getDefaultValue).build());
@@ -71,6 +55,53 @@ public class ConfigScreenBuilders {
         register(StringConfigItem.class, (EntryBuilder<String>) (configItem, entryBuilder, config) -> entryBuilder.startStrField(new TranslatableText(configItem.getDetails()), configItem.getValue()).setSaveConsumer(configItem::setValue).setDefaultValue(configItem::getDefaultValue).build());
         register(EnumConfigItem.class, new EnumEntryBuilder<>());
         register(ArrayConfigItem.class, new ArrayEntryBuilder<>());
+    }
+
+    /**
+     * Registers a new entry builder for the config item
+     *
+     * @param configItemClass The class for the config item
+     * @param builder         The entry builder for the item
+     * @param <T>             The config item type
+     */
+    public static <T extends ConfigItem<?>> void register(Class<T> configItemClass, EntryBuilder<?> builder) {
+        if (COMMANDS.containsKey(configItemClass)) {
+            throw new IllegalArgumentException("Duplicate entries for " + configItemClass.getSimpleName());
+        }
+
+        COMMANDS.put(configItemClass, builder);
+    }
+
+    /**
+     * Gets the entry builder for the config item
+     *
+     * @param configItem The config item
+     * @param <T>        The storage type for the config item
+     * @param <C>        The type of the config item
+     * @return The entry builder
+     */
+    @SuppressWarnings("unchecked")
+    public static <T, C extends ConfigItem<T>> EntryBuilder<T> getEntryBuilder(C configItem) {
+        return (EntryBuilder<T>) COMMANDS.getOrDefault(configItem.getClass(), (EntryBuilder<T>) (configItem1, entryBuilder, config) -> {
+            throw new IllegalArgumentException("Unknown Config Type");
+        });
+    }
+
+    /**
+     * An interface to create new entries for the config screen
+     *
+     * @param <T> The storage type of the config item
+     */
+    public interface EntryBuilder<T> {
+        /**
+         * Gets the entry for the config item
+         *
+         * @param configItem   The config item
+         * @param entryBuilder The cloth config entry builder
+         * @param config       The config
+         * @return A new entry for the config screen
+         */
+        AbstractConfigListEntry<?> getConfigEntry(ConfigItem<T> configItem, ConfigEntryBuilder entryBuilder, Config config);
     }
 
     @SuppressWarnings("all")

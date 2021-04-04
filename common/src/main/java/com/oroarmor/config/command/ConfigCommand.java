@@ -36,7 +36,6 @@ import com.oroarmor.config.ConfigItem;
 import com.oroarmor.config.ConfigItemGroup;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientCommandSource;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.command.CommandSource;
 import net.minecraft.network.MessageType;
@@ -83,7 +82,7 @@ public class ConfigCommand<S extends CommandSource> {
         return configListText;
     }
 
-    private int listConfigGroup(CommandContext<S> c, ConfigItemGroup group) {
+    protected int listConfigGroup(CommandContext<S> c, ConfigItemGroup group) {
         MutableText configList = new LiteralText("");
 
         configList.append(new LiteralText(group.getName() + "\n").formatted(Formatting.BOLD));
@@ -155,6 +154,12 @@ public class ConfigCommand<S extends CommandSource> {
         }
     }
 
+    /**
+     * Registers the command to the dispatcher
+     *
+     * @param dispatcher The dispatcher
+     * @param usable     A predicate to say if the command is usable
+     */
     public void register(CommandDispatcher<S> dispatcher, Predicate<S> usable) {
         LiteralArgumentBuilder<S> literalArgumentBuilder = LiteralArgumentBuilder.<S>literal(config.getID()).requires(usable).executes(this::listConfigGroups);
 

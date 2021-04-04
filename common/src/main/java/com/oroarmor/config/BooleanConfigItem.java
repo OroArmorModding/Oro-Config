@@ -30,6 +30,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * A Config item for booleans
+ */
 public class BooleanConfigItem extends ConfigItem<Boolean> {
     public BooleanConfigItem(String name, Boolean defaultValue, String details) {
         super(name, defaultValue, details);

@@ -35,6 +35,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 
 public class OroConfigTestMod implements ModInitializer {
     public static Config CONFIG = new TestConfig();
+
     @Override
     public void onInitialize() {
         CONFIG.readConfigFromFile();

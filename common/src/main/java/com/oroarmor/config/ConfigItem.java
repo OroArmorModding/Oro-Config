@@ -86,6 +86,11 @@ public abstract class ConfigItem<T> {
      */
     public abstract void fromJson(JsonElement element);
 
+    /**
+     * Writes self to the json object
+     *
+     * @param object The object to write to
+     */
     public abstract void toJson(JsonObject object);
 
     /**
@@ -133,14 +138,34 @@ public abstract class ConfigItem<T> {
         return name + ":" + value;
     }
 
+    /**
+     * Returns true if the the class is validd
+     *
+     * @param clazz The class to check
+     * @param <T1>
+     * @return True if the type is validd
+     */
     public abstract <T1> boolean isValidType(Class<T1> clazz);
 
+    /**
+     * A string value to show in commands
+     *
+     * @return
+     */
     public abstract String getCommandValue();
 
+    /**
+     * @return True if the config item is at its default value
+     */
     public boolean atDefaultValue() {
         return this.value.equals(this.defaultValue);
     }
 
+    /**
+     * A string value for the default value to show in commands
+     *
+     * @return
+     */
     public String getCommandDefaultValue() {
         return this.value.toString();
     }

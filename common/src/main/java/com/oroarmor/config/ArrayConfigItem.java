@@ -76,12 +76,6 @@ public class ArrayConfigItem<T> extends ConfigItem<T[]> {
         this.value = Arrays.copyOf(defaultValue, defaultValue.length);
     }
 
-    /**
-     * Reads and sets the {@link ConfigItem} from a JSON Element. Will throw an
-     * error if the type does not match the type of the {@link ConfigItem}
-     *
-     * @param element The JSON Element
-     */
     @SuppressWarnings("unchecked")
     public void fromJson(JsonElement element) {
         for (int i = 0; i < element.getAsJsonArray().size(); i++) {

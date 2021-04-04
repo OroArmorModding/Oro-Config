@@ -26,21 +26,15 @@ package com.oroarmor.config.testmod;
 
 import com.oroarmor.config.Config;
 import com.oroarmor.config.command.ClientConfigCommand;
-import com.oroarmor.config.command.ConfigCommand;
-
-import net.minecraft.client.network.ClientCommandSource;
-import net.minecraft.server.command.ServerCommandSource;
 
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.command.v1.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 
 public class OroConfigTestModClient implements ClientModInitializer {
     public static Config CONFIG = new TestConfigClient();
+
     @Override
     public void onInitializeClient() {
         CONFIG.readConfigFromFile();

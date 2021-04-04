@@ -31,6 +31,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * A Config item for enums
+ */
 public class EnumConfigItem<T extends Enum<T>> extends ConfigItem<T> {
     public EnumConfigItem(String name, T defaultValue, String details) {
         super(name, defaultValue, details);
