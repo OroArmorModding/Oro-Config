@@ -28,11 +28,6 @@ package com.oroarmor.config.screen;
 import com.oroarmor.config.Config;
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
-import me.shedaniel.clothconfig2.api.ConfigBuilder;
-import me.shedaniel.clothconfig2.api.ConfigCategory;
-import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
-
-import net.minecraft.text.TranslatableText;
 
 /**
  * This class allows for the easy addition of a Mod Menu config screen to your
@@ -63,18 +58,6 @@ public abstract class ModMenuConfigScreen extends ConfigScreen implements ModMen
 
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
-        return screen -> {
-            ConfigBuilder builder = ConfigBuilder.create().setParentScreen(screen).setTitle(new TranslatableText("config." + config.getID()));
-            builder.setSavingRunnable(config::saveConfigToFile);
-
-            ConfigEntryBuilder entryBuilder = ConfigEntryBuilder.create();
-
-            config.getConfigs().forEach(group -> {
-                ConfigCategory groupCategory = createCategory(builder, "config." + config.getID() + "." + group.getName());
-                group.getConfigs().forEach(configItem -> setupConfigItem(configItem, groupCategory, entryBuilder));
-            });
-
-            return builder.build();
-        };
+        return this::createScreen;
     }
 }
