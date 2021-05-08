@@ -1,0 +1,14 @@
+modLoader = "javafml"
+loaderVersion = "[35,)"
+#issueTrackerURL = ""
+license = "MIT"
+
+[[mods]]
+modId = "oro-config"
+version = "${version}"
+displayName = "Oro Config"
+authors = "OroArmor"
+description = '''
+This library adds simple configs to your mod
+'''
+logoFile = "oro-config.png"

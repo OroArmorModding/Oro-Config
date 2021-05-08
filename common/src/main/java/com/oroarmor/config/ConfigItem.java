@@ -152,7 +152,9 @@ public abstract class ConfigItem<T> {
      *
      * @return
      */
-    public abstract String getCommandValue();
+    public String getCommandValue() {
+        return this.value.toString();
+    }
 
     /**
      * @return True if the config item is at its default value
@@ -167,6 +169,6 @@ public abstract class ConfigItem<T> {
      * @return
      */
     public String getCommandDefaultValue() {
-        return this.value.toString();
+        return this.defaultValue.toString();
     }
 }

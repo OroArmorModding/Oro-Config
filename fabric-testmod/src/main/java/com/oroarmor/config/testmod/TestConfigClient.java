@@ -30,6 +30,7 @@ import java.util.List;
 import com.oroarmor.config.Config;
 import com.oroarmor.config.ConfigItemGroup;
 import com.oroarmor.config.DoubleConfigItem;
+import me.shedaniel.math.Color;
 
 import net.fabricmc.loader.api.FabricLoader;
 import static com.google.common.collect.ImmutableList.of;
@@ -46,8 +47,10 @@ public class TestConfigClient extends Config {
     public static class ConfigGroupLevel1 extends ConfigItemGroup {
         public static final DoubleConfigItem testDouble = new DoubleConfigItem("test_double", 0d, "test_double", null, -1, 1);
 
+        public static final ColorConfigItem testColor = new ColorConfigItem("test_color", Color.ofTransparent(0x00FF0000), "test_color");
+
         public ConfigGroupLevel1() {
-            super(of(testDouble), "group");
+            super(of(testDouble, testColor), "group");
         }
     }
 }

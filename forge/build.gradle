@@ -79,6 +79,7 @@ sourcesJar {
 publishing {
     publications {
         mavenForge(MavenPublication) {
+            artifactId = "oro-config-forge"
             // add all the jars that should be included when publishing to maven
             artifact(remapJar) {
                 classifier null
