@@ -78,6 +78,7 @@ public class ArrayConfigItem<T> extends ConfigItem<T[]> {
 
     @SuppressWarnings("unchecked")
     public void fromJson(JsonElement element) {
+        this.value = Arrays.copyOf(value, element.getAsJsonArray().size());
         for (int i = 0; i < element.getAsJsonArray().size(); i++) {
             T newValue;
             JsonElement arrayElement = element.getAsJsonArray().get(i);
