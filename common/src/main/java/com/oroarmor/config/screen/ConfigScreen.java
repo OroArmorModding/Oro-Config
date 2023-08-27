@@ -37,7 +37,7 @@ import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
 
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 
 /**
  * This class allows for the easy addition of a Mod Menu config screen to your
@@ -71,14 +71,14 @@ public abstract class ConfigScreen {
     }
 
     protected ConfigCategory createCategory(ConfigBuilder builder, String categoryName) {
-        return builder.getOrCreateCategory(new TranslatableText(categoryName));
+        return builder.getOrCreateCategory(Text.translatable(categoryName));
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     protected AbstractConfigListEntry<?> createConfigItem(ConfigItem<?> ci, ConfigEntryBuilder entryBuilder, String superGroupName) {
         if (ci instanceof ConfigItemGroup) {
             List<AbstractConfigListEntry> subItems = ((ConfigItemGroup) ci).getConfigs().stream().map(configItem -> createConfigItem(configItem, entryBuilder, superGroupName + "." + ci.getName())).collect(Collectors.toList());
-            SubCategoryBuilder groupCategory = entryBuilder.startSubCategory(new TranslatableText(superGroupName + "." + ci.getName()), subItems);
+            SubCategoryBuilder groupCategory = entryBuilder.startSubCategory(Text.translatable(superGroupName + "." + ci.getName()), subItems);
             return groupCategory.build();
         }
         return ConfigScreenBuilders.getEntryBuilder(ci).getConfigEntry((ConfigItem) ci, entryBuilder, config);
@@ -92,7 +92,7 @@ public abstract class ConfigScreen {
      */
     @SuppressWarnings("rawtypes")
     public Screen createScreen(Screen parent) {
-        ConfigBuilder builder = ConfigBuilder.create().setParentScreen(parent).setTitle(new TranslatableText("config." + config.getID()));
+        ConfigBuilder builder = ConfigBuilder.create().setParentScreen(parent).setTitle(Text.translatable("config." + config.getID()));
         builder.setSavingRunnable(config::saveConfigToFile);
 
         ConfigEntryBuilder entryBuilder = ConfigEntryBuilder.create();

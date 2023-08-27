@@ -1,5 +1,5 @@
 plugins {
-    id "com.github.johnrengelman.shadow" version "5.0.0"
+    id "com.github.johnrengelman.shadow" version "7.1.2"
 }
 
 configurations {
@@ -12,10 +12,6 @@ architectury {
     forge()
 }
 
-loom {
-    useFabricMixin = true
-}
-
 artifacts {
     dev(jar)
 }
@@ -24,29 +20,24 @@ archivesBaseName = rootProject.archives_base_name + "-forge"
 version = rootProject.mod_version
 group = rootProject.maven_group
 
+repositories {
+    maven { url 'https://jitpack.io' }
+    maven { url 'https://maven.theillusivec4.top/' }
+}
+
 dependencies {
-    forge "net.minecraftforge:forge:${rootProject.minecraft_version}-${rootProject.forge_version}"
+    forge "net.minecraftforge:forge:${rootProject.forge_version}"
     // Remove the next line if you don't want to depend on the API
-    modApi "me.shedaniel:architectury-forge:${rootProject.architectury_version}"
+    modApi "dev.architectury:architectury-forge:${rootProject.architectury_version}"
 
-    implementation(project(path: ":common")) {
-        transitive = false
-    }
-    developmentForge(project(path: ":common")) {
-        transitive = false
-    }
-    shadowCommon(project(path: ":common", configuration: "transformProductionForge")) {
-        transitive = false
-    }
-
-    modImplementation("me.shedaniel.cloth:cloth-config-forge:4.11.14")
+    modImplementation("me.shedaniel.cloth:cloth-config-forge:${rootProject.cloth_config_version}")
 }
 
 shadowJar {
     exclude "fabric.mod.json"
 
     configurations = [project.configurations.shadowCommon]
-    classifier "dev-shadow"
+    //classifier "dev-shadow"
 }
 
 remapJar {
@@ -59,7 +50,7 @@ remapJar {
 }
 
 jar {
-    classifier "dev"
+    //classifier "dev"
 
     manifest {
         getAttributes()["FMLModType"] = "LIBRARY"
@@ -73,9 +64,10 @@ java {
 sourcesJar {
     def commonSources = project(":common").remapSourcesJar
     dependsOn commonSources
-    from zipTree(commonSources.output)
+    //from zipTree(commonSources.output)
 }
 
+/*
 publishing {
     publications {
         mavenForge(MavenPublication) {
@@ -98,3 +90,5 @@ publishing {
         // Add repositories to publish to here.
     }
 }
+
+ */

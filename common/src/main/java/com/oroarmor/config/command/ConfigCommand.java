@@ -38,11 +38,10 @@ import com.oroarmor.config.ConfigItemGroup;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.command.CommandSource;
-import net.minecraft.network.MessageType;
+import net.minecraft.network.message.MessageType;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.HoverEvent;
 import net.minecraft.text.HoverEvent.Action;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -73,19 +72,19 @@ public class ConfigCommand<S extends CommandSource> {
     }
 
     protected MutableText createItemText(ConfigItem<?> item) {
-        MutableText configListText = new LiteralText("");
-        configListText.append(new LiteralText("[" + I18n.translate(item.getDetails()) + "]"));
+        MutableText configListText = Text.literal("");
+        configListText.append(Text.literal("[" + I18n.translate(item.getDetails()) + "]"));
         configListText.append(" : ");
-        configListText.append(new LiteralText("[" + item.getCommandValue() + "]")
+        configListText.append(Text.literal("[" + item.getCommandValue() + "]")
                 .formatted(item.atDefaultValue() ? Formatting.GREEN : Formatting.DARK_GREEN)
-                .styled(s -> s.withHoverEvent(new HoverEvent(Action.SHOW_TEXT, new LiteralText((item.atDefaultValue() ? "At Default " : "") + "Value: " + (item.atDefaultValue() ? item.getCommandDefaultValue() : item.getCommandValue()))))));
+                .styled(s -> s.withHoverEvent(new HoverEvent(Action.SHOW_TEXT, Text.literal((item.atDefaultValue() ? "At Default " : "") + "Value: " + (item.atDefaultValue() ? item.getCommandDefaultValue() : item.getCommandValue()))))));
         return configListText;
     }
 
     protected int listConfigGroup(CommandContext<S> c, ConfigItemGroup group) {
-        MutableText configList = new LiteralText("");
+        MutableText configList = Text.literal("");
 
-        configList.append(new LiteralText(group.getName() + "\n").formatted(Formatting.BOLD));
+        configList.append(Text.literal(group.getName() + "\n").formatted(Formatting.BOLD));
         for (ConfigItem<?> item : group.getConfigs())
             parseConfigItemText(configList, item, "  ");
 
@@ -101,10 +100,10 @@ public class ConfigCommand<S extends CommandSource> {
     }
 
     protected int listConfigGroups(CommandContext<S> c) {
-        MutableText configList = new LiteralText("");
+        MutableText configList = Text.literal("");
 
         for (ConfigItemGroup group : config.getConfigs()) {
-            configList.append(new LiteralText(group.getName() + "\n").formatted(Formatting.BOLD));
+            configList.append(Text.literal(group.getName() + "\n").formatted(Formatting.BOLD));
             for (ConfigItem<?> item : group.getConfigs()) {
                 parseConfigItemText(configList, item, "  ");
             }
@@ -124,7 +123,7 @@ public class ConfigCommand<S extends CommandSource> {
         configList.append(padding);
         configList.append("|--> ");
         if (item instanceof ConfigItemGroup) {
-            configList.append(new LiteralText(item.getName() + "\n").formatted(Formatting.BOLD));
+            configList.append(Text.literal(item.getName() + "\n").formatted(Formatting.BOLD));
             for (ConfigItem<?> item2 : ((ConfigItemGroup) item).getConfigs()) {
                 parseConfigItemText(configList, item2, padding + "| ");
             }
@@ -148,9 +147,9 @@ public class ConfigCommand<S extends CommandSource> {
 
     private void sendFeedback(CommandContext<S> c, Text text) throws CommandSyntaxException {
         if (c.getSource() instanceof ServerCommandSource) {
-            ((ServerCommandSource) c.getSource()).getPlayer().sendSystemMessage(text, Util.NIL_UUID);
+            ((ServerCommandSource) c.getSource()).getPlayer().sendMessage(text, false);
         } else if (c.getSource().getClass().getSimpleName().toLowerCase().contains("client")) {
-            MinecraftClient.getInstance().inGameHud.addChatMessage(MessageType.CHAT, text, Util.NIL_UUID);
+            MinecraftClient.getInstance().player.sendMessage(text, false);
         }
     }
 
