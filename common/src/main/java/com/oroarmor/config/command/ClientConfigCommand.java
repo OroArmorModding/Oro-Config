@@ -30,8 +30,9 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.oroarmor.config.Config;
 import com.oroarmor.config.ConfigItemGroup;
-import com.oroarmor.config.screen.ConfigScreen;
 
+import com.oroarmor.config.screen.ConfigScreen;
+import dev.architectury.platform.Platform;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.command.CommandSource;
@@ -63,9 +64,12 @@ public class ClientConfigCommand<S extends CommandSource> extends ConfigCommand<
         }
 
         literalArgumentBuilder.then(LiteralArgumentBuilder.<S>literal("gui").executes(context -> {
-            openScreen = new ConfigScreen(config) {
-            }.createScreen(MinecraftClient.getInstance().currentScreen);
-            return 1;
+            if(Platform.isModLoaded("cloth-config")){
+                openScreen = new ConfigScreen(config) {
+                }.createScreen(MinecraftClient.getInstance().currentScreen);
+                return 1;
+            }
+            return 0;
         }));
 
         dispatcher.register(literalArgumentBuilder);

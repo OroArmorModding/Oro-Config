@@ -1,8 +1,7 @@
 plugins {
     id "java"
-    id "architectury-plugin" version "3.0.99"
-    id "forgified-fabric-loom" version "0.6.79" apply false
-    id 'org.cadixdev.licenser' version '0.5.0' apply false
+    id "architectury-plugin" version "3.4-SNAPSHOT"
+    id "dev.architectury.loom" version "1.1-SNAPSHOT" apply false
 }
 
 architectury {
@@ -10,126 +9,38 @@ architectury {
 }
 
 subprojects {
-    apply plugin: "forgified-fabric-loom"
-    apply plugin: "signing"
-    apply plugin: "maven"
-    apply plugin: 'org.cadixdev.licenser'
+    apply plugin: "dev.architectury.loom"
 
     loom {
-        useFabricMixin = true
+        silentMojangMappingsLicense()
     }
 
     dependencies {
         minecraft "com.mojang:minecraft:${rootProject.minecraft_version}"
-        mappings "net.fabricmc:yarn:1.16.5+build.4"
+        mappings "net.fabricmc:yarn:1.20.1+build.8:v2"
     }
 
-    license {
-        header = rootProject.file("LICENSE")
-    }
-
-    task sourceJar(type: Jar) {
-        classifier "sources"
-        from sourceSets.main.allSource
-    }
-
-    task javadocJar(type: Jar) {
-        classifier "javadoc"
-    }
-
-    artifacts {
-        archives remapJar, javadocJar, sourceJar
-    }
-
-    tasks.withType(Sign) {
-        onlyIf { project.hasProperty("sign") }
-    }
-
-    if (project.hasProperty("sign")) {
-        signing {
-            useGpgCmd()
-            sign configurations.archives
-        }
-    }
-
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                def ossrhUsername = "OroArmor"
-                def ossrhPassword = project.hasProperty("ossrhPassword") ? project.property("ossrhPassword") : System.getenv("OSSRH_PASSWORD")
-
-                beforeDeployment {
-                    MavenDeployment deployment -> signing.signPom(deployment)
-                }
-
-                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-
-                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-
-                pom.project {
-                    name 'OroConfig'
-                    packaging 'jar'
-                    description 'A simple Minecraft Config Library'
-                    url 'http://github.com/OroArmor/Oro-Config'
-
-                    scm {
-                        connection 'scm:git:git://github.com/OroArmor/Oro-Config.git'
-                        developerConnection 'scm:git:ssh://github.com:OroArmor/Oro-Config.git'
-                        url 'http://github.com/OroArmor/Oro-Config'
-                    }
-
-                    licenses {
-                        license {
-                            name 'MIT'
-                            url 'https://mit-license.org/'
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id 'OroArmor'
-                            name 'Eli Orona'
-                            email 'eliorona@live.com'
-                            url "oroarmor.com"
-                        }
-                    }
-                }
-            }
-        }
-    }
 }
 
 allprojects {
     apply plugin: "java"
     apply plugin: "architectury-plugin"
-    apply plugin: "maven-publish"
 
     archivesBaseName = rootProject.archives_base_name
     version = rootProject.mod_version
     group = rootProject.maven_group
 
+    repositories {
+        maven {
+            url "https://maven.fabricmc.net/"
+        }
+    }
     tasks.withType(JavaCompile) {
         options.encoding = "UTF-8"
-
-        // The Minecraft launcher currently installs Java 8 for users, so your mod probably wants to target Java 8 too
-        // JDK 9 introduced a new way of specifying this that will make sure no newer classes or methods are used.
-        // We'll use that if it's available, but otherwise we'll use the older option.
-        def targetVersion = 8
-        if (JavaVersion.current().isJava9Compatible()) {
-            options.release = targetVersion
-        }
+        options.release = 17
     }
 
     java {
         withSourcesJar()
     }
-}
-
-
-task publishToMavenCentral {
-
 }
